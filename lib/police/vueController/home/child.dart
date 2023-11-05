@@ -21,6 +21,9 @@ class _HomeChildState extends State<HomeChild> {
       heure_Year = userInfo.heureYear ?? '00:00:00';
       heure_Month = userInfo.heureMonth ?? '00:00:00';
       heure_Week = userInfo.heureWeek ?? '00:00:00';
+      print(heure_Year);
+      print(heure_Month);
+      print(heure_Week);
     } else {
       // Gérer la connexion échouée ici
     }

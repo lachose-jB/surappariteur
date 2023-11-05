@@ -11,74 +11,66 @@ import '../../police/helper/serveur/authentificateur.dart';
 import '../notif/notifScreen.dart';
 
 class DocumentShild extends StatefulWidget {
-  const DocumentShild({super.key});
+  const DocumentShild({Key? key}) : super(key: key);
 
   @override
   State<DocumentShild> createState() => _DocumentShildState();
 }
 
 class _DocumentShildState extends State<DocumentShild> {
-  int itemCount = 0;
   int columnCount = 2;
-  var DocName = "";
-  var DocDescription = "";
-  var DocLien = "";
   List<Alldoc> userDocs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    ShowUserDoc();
+  }
 
   Future<void> ShowUserDoc() async {
     final userDoc = await AuthApi.DocUser();
     if (userDoc != null) {
-      itemCount = userDoc.alldoc.length;
-      print(userDoc);
-      for (int i = 1; i < itemCount; i++) {
-        DocName = userDoc.alldoc[i].typeDoc;
-        DocDescription = userDoc.alldoc[i].description;
-        DocLien = userDoc.alldoc[i].lienDoc;
-        print(DocLien);
-        print(i);
-      }
-      print(itemCount);
+      setState(() {
+        userDocs = userDoc.alldoc;
+      });
     } else {
-      print(userDoc);
-      // Gérer la connexion échouée ici
+      // Handle the failed connection here
     }
   }
 
   @override
   Widget build(BuildContext context) {
     double _w = MediaQuery.of(context).size.width;
-    ShowUserDoc();
     return Scaffold(
       appBar: TopBarS(
         onNotificationPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NotifScreen()));
+            context,
+            MaterialPageRoute(builder: (context) => NotifScreen()),
+          );
         },
-        PageName: "Mes documents", // Pass the page name here
+        PageName: "Mes documents",
       ),
       backgroundColor: Colors.white,
       body: AnimationLimiter(
         child: GridView.count(
           physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           padding: EdgeInsets.all(_w / 60),
           crossAxisCount: columnCount,
-          children: List.generate(
-            itemCount,
-            (int index) {
-              return AnimationConfiguration.staggeredGrid(
-                position: index,
-                duration: const Duration(milliseconds: 500),
-                columnCount: columnCount,
-                child: ListItem(
-                  width: _w,
-                  DocName: DocName,
-                  DocDescription: DocDescription,
-                  DocLien: DocLien,
-                ),
-              );
-            },
-          ),
+          children: userDocs.map((doc) {
+            return AnimationConfiguration.staggeredGrid(
+              duration: const Duration(milliseconds: 500),
+              columnCount: columnCount,
+              position: 1,
+              child: ListItem(
+                width: _w,
+                doc: doc,
+                key: null,
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
@@ -87,111 +79,92 @@ class _DocumentShildState extends State<DocumentShild> {
 
 class ListItem extends StatelessWidget {
   final double width;
-  final String DocName;
-  final String DocDescription;
-  final String DocLien;
+  final Alldoc doc;
 
   ListItem({
+    required Key? key,
     required this.width,
-    required this.DocName,
-    required this.DocDescription,
-    required this.DocLien,
-  });
+    required this.doc,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ScaleAnimation(
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.fastEaseInToSlowEaseOut,
-      scale: 1.5,
-      child: FadeInAnimation(
-        child: OpenContainer(
-          closedBuilder: (_, openContainer) {
-            return Container(
-              margin: EdgeInsets.only(
-                bottom: width / 30,
-                left: width / 60,
-                right: width / 60,
+    return OpenContainer(
+      closedBuilder: (_, openContainer) {
+        return Container(
+          margin: EdgeInsets.only(
+            bottom: width / 30,
+            left: width / 60,
+            right: width / 60,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                spreadRadius: 2,
               ),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: const BorderRadius.all(Radius.circular(30)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 20,
-                    spreadRadius: 2,
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Align(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    doc.typeDoc,
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(
-                    16.0), // Ajustez le padding selon vos besoins
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Column(
                     children: <Widget>[
-                      // Titre de taille responsive
-                      Flexible(
-                        child: Text(
-                          DocName,
-                          style: const TextStyle(
-                            fontSize:
-                                18.0, // Ajustez la taille de police selon vos besoins
-                            fontWeight: FontWeight
-                                .bold, // Optionnel : ajustez la graisse de la police
-                          ),
-                        ),
-                      ),
-                      // Colonne contenant l'heure et la date
-                      Column(
-                        children: <Widget>[
-                          // Format heure
-                          Text(
-                            DocDescription, // Heure formatée
-                            style: const TextStyle(fontSize: 16.0),
-                          ),
-                        ],
+                      Text(
+                        doc.description ?? 'No description available',
+                        style: const TextStyle(fontSize: 16.0),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            );
-          },
-          openColor: Colors.transparent,
-          closedElevation: 20.0,
-          closedColor: Colors.transparent,
-          openBuilder: (_, closeContainer) {
-            return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.blue,
-                title: const Text('Retour'),
-                leading: IconButton(
-                  onPressed: closeContainer,
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                ),
-              ),
-              body: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Ouvrez le document lorsque le bouton est appuyé
-                    _launchURL(DocLien);
-                  },
-                  child: const Text('Ouvrir le document'),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
+      openColor: Colors.transparent,
+      closedElevation: 20.0,
+      closedColor: Colors.transparent,
+      openBuilder: (_, closeContainer) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.blue,
+            title: const Text('Retour'),
+            leading: IconButton(
+              onPressed: closeContainer,
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+            ),
+          ),
+          body: Center(
+            child: ElevatedButton(
+              onPressed: () {
+                _launchURL(doc.lienDoc);
+              },
+              child: const Text('Ouvrir le document'),
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
-void _launchURL(String url) async {
-  if (await canLaunch(url)) {
+void _launchURL(String? url) async {
+  if (url != null && await canLaunch(url)) {
     await launch(url);
   } else {
     throw 'Impossible d\'ouvrir le lien $url';

@@ -101,9 +101,11 @@ class AuthApi {
   }
 
   static Future<UserDoc?> DocUser() async {
-    final tokenInfo = tokenVar; // Make sure tokenVar is correctly initialized
-
+    late var tokenInfo;
     try {
+      tokenInfo =
+          tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+
       const url = 'https://appariteur.com/api/users/document.php';
       final response = await http.get(
         Uri.parse(url),
@@ -115,38 +117,28 @@ class AuthApi {
 
       if (response.statusCode == 200) {
         final docs = jsonDecode(response.body);
-
         if (docs['success'] == true) {
           final List<dynamic> docInfo = docs['result'] as List;
           print(docInfo);
           print("+++++++++++++++++++++++++++++++++++++++++++");
-          final List<Alldoc> alldocList = docInfo.map((docs) {
+          final List<Alldoc> alldocList = docInfo.map((infos) {
             return Alldoc(
-              id: docs['id'],
-              typeDoc: docs['type_doc'],
-              description: docs['description'],
-              lienDoc: docs['lien_doc'],
+              id: infos['id'],
+              typeDoc: infos['type_doc'],
+              description: infos['description'] ??
+                  'No description available', // Provide a default value
+              lienDoc: infos['lien_doc'],
             );
           }).toList();
-          print("+++++++++++++++++++++++++++++++++++++++++++");
-          print(Alldoc);
-
+          print(alldocList);
           return UserDoc(
             alldoc: alldocList,
           );
-        } else {
-          // Handle the case where the API response indicates failure.
-          print('API request was not successful.');
         }
-      } else {
-        // Handle other status codes if needed.
-        print('API request failed with status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle exceptions that may occur during the API request.
-      print('Error connecting to the API: $e');
+      print('Erreur lors de la connexion à l\'API : $e');
     }
-
-    return null; // Handle errors as per your requirements
+    return null; // Gérer les erreurs comme vous le souhaitez
   }
 }

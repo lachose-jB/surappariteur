@@ -1,5 +1,5 @@
 class Alldoc {
-  final String id;
+  final id;
   final String typeDoc;
   final String description;
   final String lienDoc;
