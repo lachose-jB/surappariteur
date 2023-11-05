@@ -1,6 +1,9 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
 import '../../acteurs/user.dart';
@@ -133,6 +136,72 @@ class AuthApi {
           print(alldocList);
           return UserDoc(
             alldoc: alldocList,
+          );
+        }
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion à l\'API : $e');
+    }
+    return null; // Gérer les erreurs comme vous le souhaitez
+  }
+
+  static Future<MissionEffUser?> MissionUser(
+      String dateStarts, String dateEnd) async {
+    final tokenInfo =
+        tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+
+    try {
+      final url =
+          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateStarts&date_end=$dateEnd';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenInfo',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final docs = jsonDecode(response.body);
+        print(dateEnd);
+        if (docs['success'] == true) {
+          final List<dynamic> missions = docs['result'] as List;
+          print("+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+          print(missions);
+          print(
+              " |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-");
+          final List<Mission> missionList = missions.map((missionData) {
+            return Mission(
+              date: missionData['date'],
+              reference: missionData['reference'],
+              etabli: missionData['etabli'],
+              duree: missionData['duree'],
+            );
+          }).toList();
+          print(
+              "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+          print(missionList);
+          print(
+              "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+          final month = docs['month'];
+          final monthyear = docs['monthyear'];
+          final sumHeure = docs['sum_heure'];
+          final lastyear = docs['lastyear'];
+
+          final List<dynamic> yearsData = docs['years'] as List;
+          final List<Year> yearList = yearsData.map((yearData) {
+            return Year(
+              year: yearData['year'],
+            );
+          }).toList();
+
+          return MissionEffUser(
+            result: missionList,
+            month: month,
+            monthyear: monthyear,
+            sum_heure: sumHeure,
+            lastyear: lastyear,
+            years: yearList,
           );
         }
       }

@@ -1,7 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:surappariteur/police/acteurs/missionuser.dart';
+
+import '../../helper/serveur/authentificateur.dart';
+
 class BodyM extends StatefulWidget {
   const BodyM({super.key});
 
@@ -10,9 +13,45 @@ class BodyM extends StatefulWidget {
 }
 
 class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
+  String dateDebut = "";
+  String dateFin = "";
+  String Date = "";
+  String Reference = "";
+  String Etablissement = "";
+  String Duree = "";
+  String TotalMissionEffectuer = "0";
+  String FusturMission = "0";
+  List<Mission> listMission = [];
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<double> _animation2;
+
+  Future<void> ShowUserMission(dateDebut, dateFin) async {
+    final userMission = await AuthApi.MissionUser(dateDebut, dateFin);
+    print(
+        "+=+=+=+=+=+=+==+=+=+=+=+=+=+ADJAHOUISSO=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+    print(dateDebut); // Assurez-vous de traiter le cas où la valeur est null
+
+    if (userMission != null) {
+      setState(() {
+        TotalMissionEffectuer = userMission.sum_heure ?? "0";
+        print(
+            "+=+=+=+=+=+=+==+=+=+=+=+=+=+ADJAHOUISSO=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+        print(
+            TotalMissionEffectuer); // Assurez-vous de traiter le cas où la valeur est null
+        FusturMission = userMission.monthyear ??
+            "0"; // Assurez-vous de traiter le cas où la valeur est null
+        listMission = userMission.result ?? [];
+        print(
+            "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
+        print(listMission);
+        print(
+            "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="); // Assurez-vous de traiter le cas où la valeur est null
+      });
+    } else {
+      // Gérer la connexion échouée ici
+    }
+  }
 
   @override
   void initState() {
@@ -44,10 +83,8 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery
-        .of(context)
-        .size
-        .width;
+    double w = MediaQuery.of(context).size.width;
+    ShowUserMission(dateDebut, dateFin);
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Stack(
@@ -62,9 +99,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: MediaQuery
-                        .sizeOf(context)
-                        .width * 0.44,
+                    width: MediaQuery.sizeOf(context).width * 0.44,
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white70,
@@ -77,25 +112,28 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                       ],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
+                    child: Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text('Missions éffectués',
+                          const Text(
+                            'Missions éffectués',
                             textAlign: TextAlign.center, // Text content
                             style: TextStyle(
                               fontSize: 24, /* Income */
                             ),
                           ),
                           Padding(
-                            padding:
-                            EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
-                            child: Text('400' /* +$12,402 */,
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 8, 0, 12),
+                            child: Text(
+                              TotalMissionEffectuer /* +$12,402 */,
                               textAlign: TextAlign.center, // Text content
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 30, /* Income */
                               ),
                             ),
@@ -105,9 +143,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   Container(
-                    width: MediaQuery
-                        .sizeOf(context)
-                        .width * 0.44,
+                    width: MediaQuery.sizeOf(context).width * 0.44,
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.green,
@@ -120,15 +156,15 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                       ],
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Padding(
+                    child: Padding(
                       padding:
-                      EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
+                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                             'Mission à venir',
                             textAlign: TextAlign.center, // Text content
                             style: TextStyle(
@@ -137,11 +173,12 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                             ),
                           ),
                           Padding(
-                            padding:
-                            EdgeInsetsDirectional.fromSTEB(0, 8, 0, 12),
-                            child: Text('5',
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                0, 8, 0, 12),
+                            child: Text(
+                              FusturMission,
                               textAlign: TextAlign.center, // Text content
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 30, // Adjust the font size as needed
                                 // You can also customize other text styles here, like color, font weight, etc.
                               ), /* Income */
@@ -156,118 +193,116 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
             ),
           ),
           AnimationLimiter(
-            child: Container(
-              margin: const EdgeInsets.only(top: 168.0),
-              // Ajoute un marginTop de 155 pixels
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
-                itemCount: 20,
-                itemBuilder: (BuildContext c, int i) {
-                  return AnimationConfiguration.staggeredList(
-                    position: i,
-                    delay: const Duration(milliseconds: 100),
-                    child: SlideAnimation(
-                      duration: const Duration(milliseconds: 2500),
+            child: ListView.builder(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              itemCount: listMission.length,
+              itemBuilder: (BuildContext c, int i) {
+                Mission mission =
+                    listMission[i]; // Récupération de la mission correspondante
+
+                // Récupération des détails de la mission
+                Date = mission.date;
+                Reference = mission.reference;
+                Etablissement = mission.etabli;
+                Duree = mission.duree;
+
+                return AnimationConfiguration.staggeredList(
+                  position: i,
+                  delay: const Duration(milliseconds: 100),
+                  child: SlideAnimation(
+                    duration: const Duration(milliseconds: 2500),
+                    curve: Curves.fastLinearToSlowEaseIn,
+                    horizontalOffset: 30,
+                    verticalOffset: 300.0,
+                    child: FlipAnimation(
+                      duration: const Duration(milliseconds: 3000),
                       curve: Curves.fastLinearToSlowEaseIn,
-                      horizontalOffset: 30,
-                      verticalOffset: 300.0,
-                      child: FlipAnimation(
-                        duration: const Duration(milliseconds: 3000),
-                        curve: Curves.fastLinearToSlowEaseIn,
-                        flipAxis: FlipAxis.y,
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: w / 20),
-                          height: w / 4,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(20),
+                      flipAxis: FlipAxis.y,
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: w / 20),
+                        height: w / 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 40,
+                              spreadRadius: 10,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 40,
-                                spreadRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              // Icône
-                              Icon(
-                                Icons.task_rounded,
-                                size: 36,
-                                // Changer la taille en fonction de vos besoins
-                                color: Colors
-                                    .blue, // Changer la couleur en fonction de vos besoins
-                              ),
-                              // Colonne Date, Etablissement, Heure
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceAround,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceAround,
-                                    children: [
-                                      // Icône
-                                      Icon(
-                                        Icons.school,
-                                        size: 25,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      SizedBox(width: 10.0,),
-                                      Text("Etablissement: "),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .spaceAround,
-                                    children: [
-                                      // Icône
-                                      Icon(
-                                        Icons.date_range,
-                                        size: 18,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      Text("Date: "),
-                                      SizedBox(width: 10.0,),
-                                      Icon(
-                                        Icons.access_time,
-                                        size: 18,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      Text("Heure: "),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              // Icône "Détails"
-                              Icon(
-                                Icons.edit,
-                                size: 20,
-                                // Changer la taille en fonction de vos besoins
-                                color: Colors
-                                    .blue, // Changer la couleur en fonction de vos besoins
-                              ),
-                            ],
-                          ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            // Icône
+                            const Icon(
+                              Icons.task_rounded,
+                              size: 36,
+                              color: Colors.blue,
+                            ),
+                            // Colonne Date, Etablissement, Heure
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    // Icône
+                                    const Icon(
+                                      Icons.school,
+                                      size: 25,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(
+                                      width: 10.0,
+                                    ),
+                                    Text(Etablissement),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    // Icône
+                                    const Icon(
+                                      Icons.date_range,
+                                      size: 18,
+                                      color: Colors.teal,
+                                    ),
+                                    Text(Date),
+                                    const SizedBox(
+                                      width: 10.0,
+                                    ),
+                                    const Icon(
+                                      Icons.access_time,
+                                      size: 18,
+                                      color: Colors.teal,
+                                    ),
+                                    Text(Duree),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            // Icône "Détails"
+                            const Icon(
+                              Icons.edit,
+                              size: 20,
+                              color: Colors.blue,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -275,7 +310,16 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget homePageCardsGroup(Color color, IconData icon, String title, BuildContext context, Widget route, Color color2, IconData icon2, String title2, Widget route2) {
+  Widget homePageCardsGroup(
+      Color color,
+      IconData icon,
+      String title,
+      BuildContext context,
+      Widget route,
+      Color color2,
+      IconData icon2,
+      String title2,
+      Widget route2) {
     double w = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.only(bottom: w / 17),
@@ -289,7 +333,8 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget homePageCard(Color color, IconData icon, String title, BuildContext context, Widget route) {
+  Widget homePageCard(Color color, IconData icon, String title,
+      BuildContext context, Widget route) {
     double w = MediaQuery.of(context).size.width;
     return Opacity(
       opacity: _animation.value,
