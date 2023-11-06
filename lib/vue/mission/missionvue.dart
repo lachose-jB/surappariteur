@@ -29,7 +29,7 @@ class MissionScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body: const BodyM(),
+      body: BodyM(),
     );
   }
 }

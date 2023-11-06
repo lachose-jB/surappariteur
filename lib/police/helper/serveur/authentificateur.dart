@@ -133,7 +133,6 @@ class AuthApi {
               lienDoc: infos['lien_doc'],
             );
           }).toList();
-          print(alldocList);
           return UserDoc(
             alldoc: alldocList,
           );
@@ -146,13 +145,12 @@ class AuthApi {
   }
 
   static Future<MissionEffUser?> MissionUser(
-      String dateStarts, String dateEnd) async {
+      String dateDebut, String dateFin) async {
     final tokenInfo =
         tokenVar; // Assurez-vous que tokenVar est correctement initialisé
-
     try {
       final url =
-          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateStarts&date_end=$dateEnd';
+          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateDebut&date_end=$dateFin';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -163,13 +161,10 @@ class AuthApi {
 
       if (response.statusCode == 200) {
         final docs = jsonDecode(response.body);
-        print(dateEnd);
+        print(docs);
         if (docs['success'] == true) {
           final List<dynamic> missions = docs['result'] as List;
-          print("+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
-          print(missions);
-          print(
-              " |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-");
+          print(missions.length);
           final List<Mission> missionList = missions.map((missionData) {
             return Mission(
               date: missionData['date'],
@@ -178,23 +173,16 @@ class AuthApi {
               duree: missionData['duree'],
             );
           }).toList();
-          print(
-              "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
-          print(missionList);
-          print(
-              "+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=\n+=+=+=+=+=+=+==+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=");
           final month = docs['month'];
           final monthyear = docs['monthyear'];
           final sumHeure = docs['sum_heure'];
           final lastyear = docs['lastyear'];
-
           final List<dynamic> yearsData = docs['years'] as List;
           final List<Year> yearList = yearsData.map((yearData) {
             return Year(
               year: yearData['year'],
             );
           }).toList();
-
           return MissionEffUser(
             result: missionList,
             month: month,
