@@ -105,18 +105,20 @@ class ListItem extends StatelessWidget {
     return InkWell(
       onTap: _openPDF, // Appel de la fonction d'ouverture du PDF
       child: Container(
+        width: MediaQuery.of(context).size.width *
+            0.5, // Ajout de la largeur (80% de la largeur de l'écran)
         margin: EdgeInsets.only(
           bottom: width / 30,
           left: width / 60,
           right: width / 60,
-          top: 20,
+          top: 20, // Ajoute un marginTop de 20 pixels
         ),
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(30)),
           boxShadow: [
             BoxShadow(
-              color: Colors.red,
+              color: Colors.blueAccent, // Couleur de l'ombre corrigée
               blurRadius: 10,
             ),
           ],
