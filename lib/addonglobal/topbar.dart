@@ -10,8 +10,7 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
   TopBarS(
       {super.key, required this.onNotificationPressed, required this.PageName});
 
-  int get notificationCount =>
-      _notificationCount; // Getter for notificationCount
+  int get notificationCount => _notificationCount;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +32,7 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+      automaticallyImplyLeading: false, // Désactive le bouton de retour
       actions: <Widget>[
         Stack(
           children: [

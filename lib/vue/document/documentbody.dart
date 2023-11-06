@@ -1,6 +1,8 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:surappariteur/vue/document/docniew.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../addonglobal/topbar.dart';
 import '../../police/acteurs/userdoc.dart';
@@ -47,6 +49,13 @@ class _DocumentShildState extends State<DocumentShild> {
         },
         PageName: "Mes documents",
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const DocumentNews()));
+        },
+        child: const Icon(Icons.add),
+      ),
       backgroundColor: Colors.white,
       body: AnimationLimiter(
           child: ListView.builder(
@@ -82,18 +91,25 @@ class ListItem extends StatelessWidget {
     required this.doc,
   }) : super(key: key);
 
+  Future<void> _openPDF() async {
+    final url = doc.lienDoc; // URL du document PDF
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Impossible d\'ouvrir le lien $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        // Ouvre le lien du document lors du clic
-      },
+      onTap: _openPDF, // Appel de la fonction d'ouverture du PDF
       child: Container(
         margin: EdgeInsets.only(
           bottom: width / 30,
           left: width / 60,
           right: width / 60,
-          top: 20, // Ajoute un marginTop de 20 pixels
+          top: 20,
         ),
         decoration: const BoxDecoration(
           color: Colors.white,
