@@ -144,13 +144,14 @@ class AuthApi {
     return null; // Gérer les erreurs comme vous le souhaitez
   }
 
-  static Future<MissionEffUser?> MissionUser(
-      String dateDebut, String dateFin) async {
+  static Future<MissionEffUser?> UserMission(
+      String dateDebuts, String dateFins) async {
     final tokenInfo =
         tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+
     try {
       final url =
-          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateDebut&date_end=$dateFin';
+          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateDebuts&date_end=$dateFins';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -161,30 +162,43 @@ class AuthApi {
 
       if (response.statusCode == 200) {
         final docs = jsonDecode(response.body);
-        print(docs);
+
         if (docs['success'] == true) {
           final List<dynamic> missions = docs['result'] as List;
-          print(missions.length);
+
+          if (missions.isEmpty) {
+            // Aucune mission à afficher
+            return null;
+          }
+
           final List<Mission> missionList = missions.map((missionData) {
+            String date = missionData['date'] ?? 'null';
+            String reference = missionData['reference'] ?? 'null';
+            String etabli = missionData['etabli'] ?? 'null';
+            String duree = missionData['duree'] ?? 'null';
+
             return Mission(
-              date: missionData['date'],
-              reference: missionData['reference'],
-              etabli: missionData['etabli'],
-              duree: missionData['duree'],
+              date: date,
+              reference: reference,
+              etabli: etabli,
+              duree: duree,
             );
           }).toList();
+
           final month = docs['month'];
           final monthyear = docs['monthyear'];
           final sumHeure = docs['sum_heure'];
           final lastyear = docs['lastyear'];
+
           final List<dynamic> yearsData = docs['years'] as List;
           final List<Year> yearList = yearsData.map((yearData) {
             return Year(
               year: yearData['year'],
             );
           }).toList();
+
           return MissionEffUser(
-            result: missionList,
+            missionList: missionList,
             month: month,
             monthyear: monthyear,
             sum_heure: sumHeure,
@@ -196,6 +210,7 @@ class AuthApi {
     } catch (e) {
       print('Erreur lors de la connexion à l\'API : $e');
     }
+
     return null; // Gérer les erreurs comme vous le souhaitez
   }
 }

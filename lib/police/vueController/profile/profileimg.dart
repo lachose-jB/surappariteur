@@ -4,7 +4,6 @@ class ProfileImg extends StatelessWidget {
   const ProfileImg({
     Key? key,
   });
-
   @override
   Widget build(BuildContext context) {
     return const SizedBox(

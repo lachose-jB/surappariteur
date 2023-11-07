@@ -11,23 +11,45 @@ class BodyM extends StatefulWidget {
 }
 
 class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
-  final dateDebut = "2023-06";
-  final dateFin = "2023-11";
-  final Date = "22-25";
-  final Reference = "";
-  final Etablissement = "";
-  final Duree = "58";
-  final TotalMissionEffectuer = "0";
-  final FusturMission = "0";
+  late var dateDebuts;
+  late var dateFins;
+  late String Date;
+  late String Reference;
+  late String Etablissement;
+  late String Duree;
+  var TotalMissionEffectuer = 0;
+  var FusturMission = 0;
   late Mission mission;
   List<Mission> listMission = [];
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<double> _animation2;
 
-  Future<void> ShowUserMission(dateDebuts, dateFins) async {
-    final userMiss = await AuthApi.MissionUser(dateDebuts, dateFins);
-    print(userMiss);
+  Future<void> ShowUserMission(var dateDebuts, var dateFins) async {
+    final userMiss = await AuthApi.UserMission(dateDebuts, dateFins);
+
+    if (userMiss != null) {
+      listMission = userMiss.missionList;
+      TotalMissionEffectuer = listMission.length;
+
+      // Vous pouvez parcourir la liste des missions ici
+      for (var mission in listMission) {
+        Date = mission.date;
+        Reference = mission.reference;
+        Etablissement = mission.etabli;
+        Duree = mission.duree;
+        print(
+            'Date: $Date, Reference: $Reference, Etablissement: $Etablissement, Durée: $Duree');
+      }
+
+      print('|||||||||||||||||||$TotalMissionEffectuer|||||||||||||||||');
+      print('Missions récupérées avec succès: $userMiss');
+    } else {
+      TotalMissionEffectuer = 0;
+      listMission
+          .clear(); // Réinitialisez la liste en cas d'erreur ou de valeur nulle
+      print('Aucune mission à afficher');
+    }
   }
 
   @override
@@ -60,8 +82,12 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    dateDebuts = '2023-06';
+    dateFins = '2023-11';
+    ShowUserMission(dateDebuts, dateFins);
     double w = MediaQuery.of(context).size.width;
-    ShowUserMission(dateDebut, dateFin);
+    print(dateFins);
+    print(dateDebuts);
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Stack(
@@ -108,7 +134,8 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0, 8, 0, 12),
                             child: Text(
-                              TotalMissionEffectuer /* +$12,402 */,
+                              '$TotalMissionEffectuer',
+                              /* +$12,402 */
                               textAlign: TextAlign.center, // Text content
                               style: const TextStyle(
                                 fontSize: 30, /* Income */
@@ -153,7 +180,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 0, 8, 0, 12),
                             child: Text(
-                              FusturMission,
+                              '$FusturMission',
                               textAlign: TextAlign.center, // Text content
                               style: const TextStyle(
                                 fontSize: 30, // Adjust the font size as needed
@@ -177,10 +204,13 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                 physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics(),
                 ),
-                itemCount: 20,
-                itemBuilder: (BuildContext c, int i) {
+                itemCount: TotalMissionEffectuer,
+                itemBuilder: (BuildContext context, int index) {
+                  // Obtenez la mission actuelle
+                  Mission mission = listMission[index];
+
                   return AnimationConfiguration.staggeredList(
-                    position: i,
+                    position: index,
                     delay: const Duration(milliseconds: 100),
                     child: SlideAnimation(
                       duration: const Duration(milliseconds: 2500),
@@ -192,93 +222,24 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                         curve: Curves.fastLinearToSlowEaseIn,
                         flipAxis: FlipAxis.y,
                         child: Container(
-                          margin: EdgeInsets.only(bottom: w / 20),
-                          height: w / 4,
+                          margin: EdgeInsets.only(
+                              bottom: w / 20, left: w / 28, right: w / 28),
+                          height: w / 5,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: const BorderRadius.all(
-                              Radius.circular(20),
+                              Radius.circular(15),
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withOpacity(0.2),
                                 blurRadius: 40,
                                 spreadRadius: 10,
                               ),
                             ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              // Icône
-                              const Icon(
-                                Icons.task_rounded,
-                                size: 36,
-                                // Changer la taille en fonction de vos besoins
-                                color: Colors
-                                    .blue, // Changer la couleur en fonction de vos besoins
-                              ),
-                              // Colonne Date, Etablissement, Heure
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      // Icône
-                                      const Icon(
-                                        Icons.school,
-                                        size: 25,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      const SizedBox(
-                                        width: 10.0,
-                                      ),
-                                      Text(Etablissement),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      // Icône
-                                      const Icon(
-                                        Icons.date_range,
-                                        size: 18,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      Text(Date),
-                                      const SizedBox(
-                                        width: 10.0,
-                                      ),
-                                      const Icon(
-                                        Icons.access_time,
-                                        size: 18,
-                                        // Changer la taille en fonction de vos besoins
-                                        color: Colors
-                                            .teal, // Changer la couleur en fonction de vos besoins
-                                      ),
-                                      Text(Duree),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              // Icône "Détails"
-                              const Icon(
-                                Icons.edit,
-                                size: 20,
-                                // Changer la taille en fonction de vos besoins
-                                color: Colors
-                                    .blue, // Changer la couleur en fonction de vos besoins
-                              ),
-                            ],
+                            children: [],
                           ),
                         ),
                       ),

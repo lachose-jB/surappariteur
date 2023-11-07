@@ -62,7 +62,7 @@ class _DocumentShildState extends State<DocumentShild> {
         physics: const BouncingScrollPhysics(
           parent: AlwaysScrollableScrollPhysics(),
         ),
-        padding: EdgeInsets.all(_w / 60),
+        padding: const EdgeInsets.all(25),
         itemCount: userDocs.length,
         itemBuilder: (BuildContext context, int index) {
           final doc = userDocs[index];
@@ -82,13 +82,11 @@ class _DocumentShildState extends State<DocumentShild> {
 }
 
 class ListItem extends StatelessWidget {
-  final double width;
   final Alldoc doc;
-
-  ListItem({
+  const ListItem({
     required Key? key,
-    required this.width,
     required this.doc,
+    required double width,
   }) : super(key: key);
 
   Future<void> _openPDF() async {
@@ -100,46 +98,60 @@ class ListItem extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: _openPDF, // Appel de la fonction d'ouverture du PDF
-      child: Container(
-        width: MediaQuery.of(context).size.width *
-            0.5, // Ajout de la largeur (80% de la largeur de l'écran)
-        margin: EdgeInsets.only(
-          bottom: width / 30,
-          left: width / 60,
-          right: width / 60,
-          top: 20, // Ajoute un marginTop de 20 pixels
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blueAccent, // Couleur de l'ombre corrigée
-              blurRadius: 10,
+  Future<void> deleteDocument(BuildContext context) async {
+    final bool deleteConfirmed = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: const Text('Voulez-vous vraiment supprimer ce document ?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Oui'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Non'),
             ),
           ],
+        );
+      },
+    );
+    if (deleteConfirmed) {
+      // Mettez ici la logique de suppression du document
+      // Après la suppression, vous pouvez mettre à jour l'interface utilisateur ou rediriger l'utilisateur vers une autre page.
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: TextButton(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.black,
+          padding: const EdgeInsets.all(5),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: const Color(0xFFDBDCDC),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Align(
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  doc.typeDoc,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+        onPressed: _openPDF,
+        child: Row(
+          children: [
+            const SizedBox(width: 20),
+            Expanded(child: Text(doc.typeDoc)),
+            IconButton(
+              icon: const Icon(Icons.delete,
+                  color: Colors.black), // Icône de la corbeille
+              onPressed: () => deleteDocument(
+                  context), // Appel de la fonction de suppression
             ),
-          ),
+          ],
         ),
       ),
     );
