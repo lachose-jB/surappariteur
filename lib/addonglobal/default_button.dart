@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:surappariteur/addonglobal/size_config.dart';
+
 class DefaultButton extends StatelessWidget {
   const DefaultButton({
     Key? key,
@@ -11,12 +12,13 @@ class DefaultButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      width: 120,
       height: getProportionateScreenHeight(56),
       child: TextButton(
         style: TextButton.styleFrom(
-          foregroundColor: Colors.white, shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          foregroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
           backgroundColor: Colors.blue,
         ),
         onPressed: press as void Function()?,

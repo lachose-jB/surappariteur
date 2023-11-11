@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surappariteur/police/vueController/profile/profileimg.dart';
 import 'package:surappariteur/police/vueController/profile/profilpage.dart';
 import 'package:surappariteur/vue/aide/aidebody.dart';
 import 'package:surappariteur/vue/contrat/contrabody.dart';
 import 'package:surappariteur/vue/document/documentbody.dart';
+import 'package:surappariteur/vue/login/loginvue.dart';
 import 'package:surappariteur/vue/notif/notifScreen.dart';
 import 'package:surappariteur/vue/paramettre/paramettrebody.dart';
 
@@ -78,15 +80,17 @@ class ProfileChild extends StatelessWidget {
             },
           ),
           FirsContentPro(
-            text: "Déconnexion",
-            icon: "assets/icons/Log out.svg",
-            press: () => {
-              Navigator.push(
-                context,
-                SlideTransition1(const ProfilePage()),
-              ),
-            },
-          ),
+              text: "Déconnexion",
+              icon: "assets/icons/Log out.svg",
+              press: () async {
+                SharedPreferences share = await SharedPreferences.getInstance();
+                share.clear();
+                // ignore: use_build_context_synchronously
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginVue()),
+                );
+              }),
         ],
       ),
     );

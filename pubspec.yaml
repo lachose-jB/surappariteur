@@ -55,6 +55,7 @@ dependencies:
   flutter_cached_pdfview: ^0.4.2
   syncfusion_flutter_calendar: ^23.1.43
   rounded_loading_button: ^2.1.0
+
   # path
   file_picker: ^6.1.1
   path_provider: ^2.1.1

@@ -10,6 +10,7 @@ class LoginVue extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Se connecter"),
+        automaticallyImplyLeading: false,
       ),
       body: const ChildLogin(),
     );

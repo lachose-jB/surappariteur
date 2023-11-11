@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surappariteur/addonglobal/bottombar.dart';
 
 import '../../../addonglobal/constants.dart';
@@ -14,10 +15,10 @@ class SignForm extends StatefulWidget {
   const SignForm({super.key});
 
   @override
-  _SignFormState createState() => _SignFormState();
+  SignFormState createState() => SignFormState();
 }
 
-class _SignFormState extends State<SignForm> {
+class SignFormState extends State<SignForm> {
   String? authToken; // Global variable to store the token
   final _formKey = GlobalKey<FormState>();
   String email = "";
@@ -47,6 +48,10 @@ class _SignFormState extends State<SignForm> {
       UserManager.email = email;
       UserManager.password = password;
       KeyboardUtil.hideKeyboard(context);
+      SharedPreferences saveLog = await SharedPreferences.getInstance();
+      saveLog.setString("email", email);
+      saveLog.setString("password", password);
+      saveLog.setBool("isLogin", true);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MyBottomNav()),
@@ -69,16 +74,6 @@ class _SignFormState extends State<SignForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           Row(
             children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value;
-                  });
-                },
-              ),
-              const Text("Se souvenir"),
               const Spacer(),
               GestureDetector(
                 onTap: () => Navigator.pushNamed(
@@ -95,7 +90,7 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(20)),
           DefaultButton(
-            text: "Continue",
+            text: "Connecter",
             press: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
