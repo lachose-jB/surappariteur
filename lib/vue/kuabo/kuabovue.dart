@@ -2,69 +2,89 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:surappariteur/vue/kuabo/addon/child.dart';
+import 'package:surappariteur/boddy.dart';
 
 import '../../addonglobal/bottombar.dart';
 
 class Kuabo extends StatefulWidget {
   static String routeName = "/kuabo";
-  const Kuabo({super.key});
+  const Kuabo({Key? key}) : super(key: key);
 
   @override
   State<Kuabo> createState() => _KuaboState();
 }
 
-class _KuaboState extends State<Kuabo> {
+class _KuaboState extends State<Kuabo> with TickerProviderStateMixin {
+  late AnimationController animationController;
+  late Animation<double> animation;
+
   @override
   void initState() {
     super.initState();
 
-    isLogin().then((value) {
-      Timer(const Duration(seconds: 1), () {
-        if (value) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MyBottomNav()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const KuaboChild()),
-          );
-        }
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    animationController.repeat(
+        reverse: true); // Use repeat without specifying loop count
+
+    animation = Tween<double>(begin: 0.5, end: 8.0).animate(animationController)
+      ..addListener(() {
+        setState(() {});
       });
-    });
+
+    checkLoginAndNavigate();
   }
 
-  @override
-  void setState(fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
+  Future<void> checkLoginAndNavigate() async {
+    bool isUserLoggedIn = await isLogin();
+
+    Timer(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              isUserLoggedIn ? const MyBottomNav() : const BoddyD(),
+        ),
+      );
+    });
   }
 
   Future<bool> isLogin() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    if (pref.getBool("isLogin") != null && pref.getBool("isLogin")!) {
-      return true;
-    } else {
-      return false;
-    }
+    return pref.getBool("isLogin") ?? false;
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-            ),
-          ],
+        child: Container(
+          width: 150,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blueAccent.withOpacity(0.80),
+                blurRadius: animation.value + animation.value,
+                spreadRadius: animation.value,
+                offset: Offset(animation.value, animation.value),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            "assets/images/logo.jpg",
+            height: 80,
+          ),
         ),
       ),
     );
