@@ -156,7 +156,7 @@ class _HomeChildState extends State<HomeChild> {
                             ),
                             const SizedBox(height: 5.0),
                             const Text(
-                              "Cette semaine",
+                              "Cette mois",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 15.0,
@@ -211,7 +211,7 @@ class _HomeChildState extends State<HomeChild> {
                             ),
                             const SizedBox(height: 5.0),
                             const Text(
-                              "Cette semaine",
+                              "Cette année",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 15.0,

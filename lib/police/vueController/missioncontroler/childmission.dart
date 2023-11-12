@@ -24,6 +24,8 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<double> _animation2;
+  late TextEditingController startDateController;
+  late TextEditingController endDateController;
 
   Future<void> ShowUserMission(var dateDebuts, var dateFins) async {
     final userMiss = await AuthApi.UserMission(dateDebuts, dateFins);
@@ -55,6 +57,8 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    startDateController = TextEditingController();
+    endDateController = TextEditingController();
 
     _controller = AnimationController(
       vsync: this,
@@ -226,7 +230,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                               bottom: w / 20, left: w / 28, right: w / 28),
                           height: w / 5,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.green,
                             borderRadius: const BorderRadius.all(
                               Radius.circular(15),
                             ),
@@ -239,7 +243,74 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                             ],
                           ),
                           child: Row(
-                            children: [],
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    bottom: 3, top: 3, left: 5),
+                                width: 280,
+                                height: 85,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.fromSTEB(
+                                      10, 2, 10, 5),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        // Top TextView
+                                        Text(
+                                          mission.etabli,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+
+                                        // Row with TextViews
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Durrée: $Duree',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 15),
+                                            Text(
+                                              'Date: $Date',
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  // Add your edit icon onPressed functionality here
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
