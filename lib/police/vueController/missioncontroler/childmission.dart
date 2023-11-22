@@ -5,7 +5,8 @@ import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/helper/serveur/authentificateur.dart';
 
 class BodyM extends StatefulWidget {
-  const BodyM({super.key});
+  const BodyM({Key? key}) : super(key: key);
+
   @override
   State<BodyM> createState() => _BodyPvState();
 }
@@ -27,12 +28,14 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
   late TextEditingController startDateController;
   late TextEditingController endDateController;
 
-  Future<void> ShowUserMission(var dateDebuts, var dateFins) async {
+  Future<void> showUserMission(var dateDebuts, var dateFins) async {
     final userMiss = await AuthApi.UserMission(dateDebuts, dateFins);
 
     if (userMiss != null) {
-      listMission = userMiss.missionList;
-      TotalMissionEffectuer = listMission.length;
+      setState(() {
+        listMission = userMiss.missionList;
+        TotalMissionEffectuer = listMission.length;
+      });
 
       // Vous pouvez parcourir la liste des missions ici
       for (var mission in listMission) {
@@ -40,17 +43,13 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
         Reference = mission.reference;
         Etablissement = mission.etabli;
         Duree = mission.duree;
-        print(
-            'Date: $Date, Reference: $Reference, Etablissement: $Etablissement, Durée: $Duree');
       }
-
-      print('|||||||||||||||||||$TotalMissionEffectuer|||||||||||||||||');
-      print('Missions récupérées avec succès: $userMiss');
     } else {
-      TotalMissionEffectuer = 0;
-      listMission
-          .clear(); // Réinitialisez la liste en cas d'erreur ou de valeur nulle
-      print('Aucune mission à afficher');
+      setState(() {
+        TotalMissionEffectuer = 0;
+        listMission
+            .clear(); // Réinitialisez la liste en cas d'erreur ou de valeur nulle
+      });
     }
   }
 
@@ -88,7 +87,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     dateDebuts = '2023-06';
     dateFins = '2023-11';
-    ShowUserMission(dateDebuts, dateFins);
+    showUserMission(dateDebuts, dateFins);
     double w = MediaQuery.of(context).size.width;
     print(dateFins);
     print(dateDebuts);
@@ -106,7 +105,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: MediaQuery.sizeOf(context).width * 0.44,
+                    width: MediaQuery.of(context).size.width * 0.44,
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.white70,
@@ -121,7 +120,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                     ),
                     child: Padding(
                       padding:
-                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
+                          const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 15),
                       child: Column(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +135,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                           ),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 8, 0, 12),
+                                0, 2, 0, 0),
                             child: Text(
                               '$TotalMissionEffectuer',
                               /* +$12,402 */
@@ -151,7 +150,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                     ),
                   ),
                   Container(
-                    width: MediaQuery.sizeOf(context).width * 0.44,
+                    width: MediaQuery.of(context).size.width * 0.45,
                     height: 140,
                     decoration: BoxDecoration(
                       color: Colors.green,
@@ -182,7 +181,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                           ),
                           Padding(
                             padding: const EdgeInsetsDirectional.fromSTEB(
-                                0, 8, 0, 12),
+                                0, 2, 0, 0),
                             child: Text(
                               '$FusturMission',
                               textAlign: TextAlign.center, // Text content
@@ -202,7 +201,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
           ),
           AnimationLimiter(
             child: Container(
-              margin: const EdgeInsets.only(top: 168.0),
+              margin: const EdgeInsets.only(top: 175.0),
               // Ajoute un marginTop de 155 pixels
               child: ListView.builder(
                 physics: const BouncingScrollPhysics(
@@ -246,16 +245,16 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                             children: [
                               Container(
                                 margin: const EdgeInsets.only(
-                                    bottom: 3, top: 3, left: 5),
+                                    bottom: 0, top: 0, left: 0),
                                 width: 280,
-                                height: 85,
+                                height: 84,
                                 decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
+                                  borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsetsDirectional.fromSTEB(
-                                      10, 2, 10, 5),
+                                      10, 0, 10, 5),
                                   child: Center(
                                     child: Column(
                                       mainAxisAlignment:
@@ -272,7 +271,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        const SizedBox(height: 5),
+                                        const SizedBox(height: 1),
 
                                         // Row with TextViews
                                         Row(
@@ -326,30 +325,48 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
   }
 
   Widget homePageCardsGroup(
-      Color color,
-      IconData icon,
-      String title,
-      BuildContext context,
-      Widget route,
-      Color color2,
-      IconData icon2,
-      String title2,
-      Widget route2) {
+    Color color,
+    IconData icon,
+    String title,
+    BuildContext context,
+    Widget route,
+    Color color2,
+    IconData icon2,
+    String title2,
+    Widget route2,
+  ) {
     double w = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.only(bottom: w / 17),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          homePageCard(color, icon, title, context, route),
-          homePageCard(color2, icon2, title2, context, route2),
+          homePageCard(
+            color,
+            icon,
+            title,
+            context,
+            route,
+          ),
+          homePageCard(
+            color2,
+            icon2,
+            title2,
+            context,
+            route2,
+          ),
         ],
       ),
     );
   }
 
-  Widget homePageCard(Color color, IconData icon, String title,
-      BuildContext context, Widget route) {
+  Widget homePageCard(
+    Color color,
+    IconData icon,
+    String title,
+    BuildContext context,
+    Widget route,
+  ) {
     double w = MediaQuery.of(context).size.width;
     return Opacity(
       opacity: _animation.value,
