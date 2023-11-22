@@ -89,8 +89,6 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
     dateFins = '2023-11';
     showUserMission(dateDebuts, dateFins);
     double w = MediaQuery.of(context).size.width;
-    print(dateFins);
-    print(dateDebuts);
     return Scaffold(
       backgroundColor: Colors.grey,
       body: Stack(
