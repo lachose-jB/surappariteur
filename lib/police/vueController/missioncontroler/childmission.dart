@@ -280,7 +280,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              'Durrée: $Duree',
+                                              mission.duree,
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                 fontSize: 15,
@@ -289,7 +289,7 @@ class _BodyPvState extends State<BodyM> with SingleTickerProviderStateMixin {
                                             ),
                                             const SizedBox(width: 15),
                                             Text(
-                                              'Date: $Date',
+                                              mission.date,
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                 fontSize: 15,

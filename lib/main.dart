@@ -17,8 +17,8 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: [
-        const Locale('fr', ''), // Français
-        const Locale('en', ''), // Anglais (si nécessaire)
+        Locale('fr', ''), // Français
+        Locale('en', ''), // Anglais (si nécessaire)
       ],
       debugShowCheckedModeBanner: false,
       title: 'Appariteur',

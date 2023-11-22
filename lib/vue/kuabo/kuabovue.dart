@@ -8,7 +8,7 @@ import '../../addonglobal/bottombar.dart';
 
 class Kuabo extends StatefulWidget {
   static String routeName = "/kuabo";
-  const Kuabo({Key? key}) : super(key: key);
+  const Kuabo({super.key});
 
   @override
   State<Kuabo> createState() => _KuaboState();
