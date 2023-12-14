@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../helper/permission/permission.dart';
+import '../../helper/serveur/authentificateur.dart';
 
 class ProfileImgEditing extends StatefulWidget {
   const ProfileImgEditing({
@@ -16,13 +17,16 @@ class ProfileImgEditing extends StatefulWidget {
 
 class _ProfileImgEditingState extends State<ProfileImgEditing> {
   String imagePath = "";
+  final userData = AuthApi.getLoggedUserData();
   final PermissionService _permissionService = PermissionService();
 
   Future<void> _pickImage() async {
     ImagePicker _picker = ImagePicker();
     var imagePike = await _picker.pickImage(source: ImageSource.gallery);
-    imagePath = imagePike!.path;
-    setState(() {});
+    if (imagePike != null) {
+      imagePath = imagePike.path;
+      setState(() {});
+    }
   }
 
   @override
@@ -35,20 +39,24 @@ class _ProfileImgEditingState extends State<ProfileImgEditing> {
         clipBehavior: Clip.none,
         children: [
           (imagePath == "")
-              ? const CircleAvatar(
-                  backgroundImage: AssetImage("assets/images/logo.jpg"),
-                )
+              ? CircleAvatar(
+            backgroundImage: Image.network(
+              "https://appariteur.com/admins/user_images/" +
+                  userData!.image,
+              fit: BoxFit.cover,
+            ).image,
+          )
               : CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  child: ClipOval(
-                    child: Image.file(
-                      File(imagePath),
-                      width: 115,
-                      height: 115,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+            backgroundColor: Colors.transparent,
+            child: ClipOval(
+              child: Image.file(
+                File(imagePath),
+                width: 115,
+                height: 115,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           Positioned(
             right: 100,
             bottom: 0,

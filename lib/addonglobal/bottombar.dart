@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:surappariteur/vue/fichepaie/fichevue.dart';
 import 'package:surappariteur/vue/home/homevue.dart';
 
 import '../vue/Pv/pvvue.dart';
@@ -62,7 +63,7 @@ class MyBottomNavState extends State<MyBottomNav> {
         _backgroundColor = Colors.grey;
         break;
       case 1:
-        _backgroundColor = Colors.green;
+        _backgroundColor = Colors.grey;
         break;
       case 2:
         _backgroundColor = Colors.grey;
@@ -86,7 +87,7 @@ class MyBottomNavState extends State<MyBottomNav> {
       case 2:
         return const MissionScreen();
       case 3:
-        return const PvScreen();
+        return const FicheVue();
       case 4:
         return const ProfileVue();
       default:

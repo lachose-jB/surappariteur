@@ -6,10 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
+import '../../acteurs/fichepaie.dart';
 import '../../acteurs/user.dart';
 import '../../acteurs/userdoc.dart';
 
 class AuthApi {
+  static UserData? _loggedUserData;
   static var tokenVar;
   static Future<UserData?> login(String email, String password) async {
     try {
@@ -24,6 +26,25 @@ class AuthApi {
         if (data['success'] == true) {
           final userData = data['userData'];
           tokenVar = data['token'];
+          _loggedUserData = UserData(
+            userId: userData['user_id'],
+            appariteurId: userData['appariteur_id'],
+            name: userData['name'],
+            email: userData['email'],
+            tel: userData['tel'],
+            sexe: userData['sexe'],
+            image: userData['image'],
+            adresse: userData['adresse'],
+            datenais: userData['datenais'],
+            lieunais: userData['lieunais'],
+            rue: userData['rue'],
+            codepostal: userData['codepostal'],
+            ville: userData['ville'],
+            pays: userData['pays'],
+            niveau: userData['niveau'],
+            user: userData['user'],
+            token: tokenVar, // Ajouter le token au modèle UserData
+          );
           return UserData(
             userId: userData['user_id'],
             appariteurId: userData['appariteur_id'],
@@ -43,6 +64,7 @@ class AuthApi {
             user: userData['user'],
             token: tokenVar, // Ajouter le token au modèle UserData
           );
+
         }
       }
     } catch (e) {
@@ -50,12 +72,12 @@ class AuthApi {
     }
     return null; // Gérer les erreurs comme vous le souhaitez
   }
-
+  static UserData? getLoggedUserData() {
+    return _loggedUserData;
+  }
   static Future<UserInfo?> InfoUser() async {
-    late var tokenInfo;
     try {
-      tokenInfo =
-          tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+      final tokenInfo = tokenVar; // Ensure tokenVar is correctly initialized
 
       const url = 'https://appariteur.com/api/users/infos_g.php';
       final response = await http.get(
@@ -68,6 +90,7 @@ class AuthApi {
 
       if (response.statusCode == 200) {
         final info = jsonDecode(response.body);
+        print('API Response: $info'); // Print the entire response for debugging
 
         if (info['success'] == true) {
           final userInfo = info['userData'];
@@ -85,7 +108,8 @@ class AuthApi {
               soir: infos['soir'],
             );
           }).toList();
-          return UserInfo(
+
+          final donnees = UserInfo(
             heureDays: userInfo['heure_days'],
             heureWeek: userInfo['heure_week'],
             heureMonth: userInfo['heure_month'],
@@ -93,15 +117,23 @@ class AuthApi {
             infosPres: infosPresList,
             intervalWeek: intervalWeek,
             effeMis: userInfo['effe_mis'],
-            id_app: null, // Il semble y avoir une coquille dans le champ idApp
+            id_app: null, // There might be a typo here, check the field name
           );
+
+          print('Donnees: $donnees'); // Print UserInfo for debugging
+          return donnees;
+        } else {
+          print('API Error: ${info['message']}');
         }
+      } else {
+        print('API Error - Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erreur lors de la connexion à l\'API : $e');
+      print('Error during API connection: $e');
     }
-    return null; // Gérer les erreurs comme vous le souhaitez
+    return null; // Handle errors as needed
   }
+
 
   static Future<UserDoc?> DocUser() async {
     late var tokenInfo;
@@ -213,4 +245,48 @@ class AuthApi {
 
     return null; // Gérer les erreurs comme vous le souhaitez
   }
+  static Future<List<FichePaie>?> getFichesPaie() async {
+    try {
+      final tokenInfo = tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+
+      const url = 'https://appariteur.com/api/user/fichepaie.php';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenInfo',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final fichesPaieData = jsonDecode(response.body);
+
+        if (fichesPaieData['success'] == true) {
+          final List<dynamic> fichesPaieInfo = fichesPaieData['result'] as List;
+
+          if (fichesPaieInfo.isEmpty) {
+            // Aucune fiche de paie à afficher
+            return null;
+          }
+
+          final List<FichePaie> fichesPaieList = fichesPaieInfo.map((ficheData) {
+            return FichePaie(
+              id: ficheData['id'],
+              mois: ficheData['mois'],
+              annee: ficheData['annee'],
+              fichier: ficheData['fichier'],
+              dateCreate: ficheData['Datecreate'],
+            );
+          }).toList();
+
+          return fichesPaieList;
+        }
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion à l\'API pour les fiches de paie : $e');
+    }
+
+    return null; // Gérer les erreurs comme vous le souhaitez
+  }
+
 }

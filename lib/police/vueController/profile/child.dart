@@ -7,8 +7,8 @@ import 'package:surappariteur/vue/contrat/contrabody.dart';
 import 'package:surappariteur/vue/document/documentbody.dart';
 import 'package:surappariteur/vue/login/loginvue.dart';
 import 'package:surappariteur/vue/notif/notifScreen.dart';
-import 'package:surappariteur/vue/paramettre/paramettrebody.dart';
 
+import '../../../vue/parametres/paramettrebody.dart';
 import 'firscontaint.dart';
 
 class ProfileChild extends StatelessWidget {
@@ -60,7 +60,7 @@ class ProfileChild extends StatelessWidget {
             },
           ),
           FirsContentPro(
-            text: "Paramettre",
+            text: "Paramètres",
             icon: "assets/icons/Settings.svg",
             press: () => {
               Navigator.push(

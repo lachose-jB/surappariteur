@@ -17,7 +17,7 @@ class PvScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Proces Verbales", // Pass the page name here
+        PageName: "Procès-Verbaux", // Pass the page name here
       ),
       backgroundColor: Colors.grey,
       floatingActionButton: FloatingActionButton(

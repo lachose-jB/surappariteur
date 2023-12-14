@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Profile", // Pass the page name here
+        PageName: "Mon Récap", // Pass the page name here
       ),
       backgroundColor: Colors.grey,
       body: HomeChild(),

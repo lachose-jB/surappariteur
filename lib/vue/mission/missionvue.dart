@@ -17,7 +17,7 @@ class MissionScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Profile", // Pass the page name here
+        PageName: "Mes Missions", // Pass the page name here
       ),
       backgroundColor: Colors.grey,
       floatingActionButton: FloatingActionButton(

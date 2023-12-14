@@ -10,31 +10,35 @@ class HomeChild extends StatefulWidget {
 }
 
 class _HomeChildState extends State<HomeChild> {
-  DateTime _selectedDay = DateTime.now();
   var heure_Year = "";
   var heure_Month = "";
   var heure_Week = "";
 
+  @override
+  void initState() {
+    super.initState();
+    ShowUserInfo();
+  }
+
   Future<void> ShowUserInfo() async {
     final userInfo = await AuthApi.InfoUser();
     if (userInfo != null) {
-      heure_Year = userInfo.heureYear ?? '00:00:00';
-      heure_Month = userInfo.heureMonth ?? '00:00:00';
-      heure_Week = userInfo.heureWeek ?? '00:00:00';
-      print(heure_Year);
-      print(heure_Month);
-      print(heure_Week);
+      setState(() {
+        heure_Year = userInfo.heureYear ?? '00:00:00';
+        heure_Month = userInfo.heureMonth ?? '00:00:00';
+        heure_Week = userInfo.heureWeek ?? '00:00:00';
+        print(heure_Year);
+        print(heure_Month);
+        print(heure_Week);
+      });
     } else {
       // Gérer la connexion échouée ici
     }
   }
 
-  DateTime selectedDay = DateTime.now();
-  CalendarFormat calendarFormat = CalendarFormat.week;
 
   @override
   Widget build(BuildContext context) {
-    ShowUserInfo();
     return Scaffold(
       backgroundColor: Colors.grey,
       body: SingleChildScrollView(
@@ -156,7 +160,7 @@ class _HomeChildState extends State<HomeChild> {
                             ),
                             const SizedBox(height: 5.0),
                             const Text(
-                              "Cette mois",
+                              "Ce mois",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 15.0,
@@ -224,98 +228,8 @@ class _HomeChildState extends State<HomeChild> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: const Text(
-                  "Planning des missions du mois",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18.0,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30.0),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(0, 5),
-                      blurRadius: 6.0,
-                    ),
-                  ],
-                ),
-                child: TableCalendar(
-                  firstDay: DateTime.utc(2023, 1, 1),
-                  lastDay: DateTime.utc(2029, 12, 31),
-                  focusedDay: _selectedDay,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                    });
-                  },
-                  locale: 'fr', // Utilisation de la localisation française
-                ),
-              ),
-              const SizedBox(height: 30.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: const Text(
-                  "Planning des disponibilités",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18.0,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30.0),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(0, 5),
-                      blurRadius: 6.0,
-                    ),
-                  ],
-                ),
-                child: TableCalendar(
-                  firstDay: DateTime.utc(2023, 1, 1),
-                  lastDay: DateTime.utc(2029, 12, 31),
-                  focusedDay: _selectedDay,
-                  calendarFormat: calendarFormat,
-                  selectedDayPredicate: (day) {
-                    return isSameDay(_selectedDay, day);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    setState(() {
-                      _selectedDay = selectedDay;
-                    });
-                  },
-                  locale: 'fr',
-                ),
-              ),
-              // Autres éléments à ajouter à votre SingleChildScrollView
+
+
             ],
           ),
         ),
@@ -323,3 +237,4 @@ class _HomeChildState extends State<HomeChild> {
     );
   }
 }
+

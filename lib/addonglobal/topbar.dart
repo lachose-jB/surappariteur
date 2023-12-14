@@ -22,8 +22,8 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
           bottom: Radius.circular(20),
         ),
       ),
-      title: Center(
-        child: Text(
+      title:
+         Text(
           PageName,
           style: const TextStyle(
             color: Colors.white,
@@ -31,7 +31,7 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-      ),
+
       automaticallyImplyLeading: false, // Désactive le bouton de retour
       actions: <Widget>[
         Stack(

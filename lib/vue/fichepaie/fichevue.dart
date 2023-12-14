@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:surappariteur/police/vueController/fichepaieController/fichePaieChild.dart';
 
 import '../../addonglobal/topbar.dart';
 import '../../police/vueController/profile/child.dart';
 import '../notif/notifScreen.dart';
 
-class ProfileVue extends StatelessWidget {
-  static String routeName = "/profile";
+class FicheVue extends StatelessWidget {
+  static String routeName = "/fiche";
 
-  const ProfileVue({Key? key}) : super(key: key);
+  const FicheVue({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +18,10 @@ class ProfileVue extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Profil", // Pass the page name here
+        PageName: "Fiches de Paie", // Pass the page name here
       ),
       backgroundColor: Colors.blueAccent,
-      body: ProfileChild(),
+      body: FichesPaieChild(),
     );
   }
 }
