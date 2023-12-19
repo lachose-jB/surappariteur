@@ -1,14 +1,16 @@
-// ignore_for_file: must_be_immutable, non_constant_identifier_names
-
 import 'package:flutter/material.dart';
+
+import '../../police/vueController/missioncontroler/newMission.dart';
+
 
 class TopBarS extends StatelessWidget implements PreferredSizeWidget {
   final int _notificationCount = 0;
   final VoidCallback onNotificationPressed;
   String PageName = "";
+  final TabController? tabController;
 
   TopBarS(
-      {super.key, required this.onNotificationPressed, required this.PageName});
+      {super.key, required this.onNotificationPressed, required this.PageName, this.tabController});
 
   int get notificationCount => _notificationCount;
 
@@ -22,16 +24,14 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
           bottom: Radius.circular(20),
         ),
       ),
-      title:
-         Text(
-          PageName,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+      title: Text(
+        PageName,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
         ),
-
+      ),
       automaticallyImplyLeading: false, // Désactive le bouton de retour
       actions: <Widget>[
         Stack(
@@ -67,9 +67,18 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
       ],
+      bottom: tabController != null ? TabBar(
+        controller: tabController,
+        tabs: [
+          Tab(text: 'Missions effectuées'),
+          Tab(text: 'Missions à venir'),
+        ],
+      ) : null,
     );
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+
+

@@ -6,13 +6,14 @@ import '../../helper/serveur/authentificateur.dart';
 
 
 class FichesPaieChild extends StatefulWidget {
-  @override
-  _FichesPaieChildState createState() => _FichesPaieChildState();
+@override
+_FichesPaieChildState createState() => _FichesPaieChildState();
 }
 
-class _FichesPaieChildState extends State<FichesPaieChild>
-    with SingleTickerProviderStateMixin {
+class _FichesPaieChildState extends State<FichesPaieChild> {
+
   List<FichePaie>? fichesPaie;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -20,15 +21,24 @@ class _FichesPaieChildState extends State<FichesPaieChild>
     loadFichesPaie();
   }
 
+
   Future<void> loadFichesPaie() async {
+
+    print('Chargement des fiches paie...');
+    setState(() {
+      isLoading = true;
+    });
+
     final loadedFichesPaie = await AuthApi.getFichesPaie();
-    if (loadedFichesPaie != null) {
-      setState(() {
-        fichesPaie = loadedFichesPaie;
-      });
-    } else {
-      // Gérer le cas où la récupération des fiches échoue
-    }
+
+    print('Fiches de paies chargées:');
+    print(loadedFichesPaie);
+
+    setState(() {
+      fichesPaie = loadedFichesPaie;
+      isLoading = false;
+    });
+
   }
 
   @override
@@ -36,19 +46,10 @@ class _FichesPaieChildState extends State<FichesPaieChild>
     double _w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: Colors.grey,
-      body: fichesPaie == null
-          ? const Center(
-        child: CircularProgressIndicator(),
-      )
-          : fichesPaie!.isEmpty
-          ? const Center(
-        child: Text(
-          "Pas de fiche de paie",
-          style:
-          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      )
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : fichesPaie == null
+          ? Center(child: Text("Pas de fiches"))
           : AnimationLimiter(
         child: ListView.builder(
           itemCount: fichesPaie!.length,

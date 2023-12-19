@@ -7,6 +7,7 @@ import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
 import '../../acteurs/fichepaie.dart';
+import '../../acteurs/planning.dart';
 import '../../acteurs/user.dart';
 import '../../acteurs/userdoc.dart';
 
@@ -26,6 +27,7 @@ class AuthApi {
         if (data['success'] == true) {
           final userData = data['userData'];
           tokenVar = data['token'];
+          print(tokenVar);
           _loggedUserData = UserData(
             userId: userData['user_id'],
             appariteurId: userData['appariteur_id'],
@@ -65,6 +67,7 @@ class AuthApi {
             token: tokenVar, // Ajouter le token au modèle UserData
           );
 
+
         }
       }
     } catch (e) {
@@ -78,7 +81,6 @@ class AuthApi {
   static Future<UserInfo?> InfoUser() async {
     try {
       final tokenInfo = tokenVar; // Ensure tokenVar is correctly initialized
-
       const url = 'https://appariteur.com/api/users/infos_g.php';
       final response = await http.get(
         Uri.parse(url),
@@ -90,7 +92,12 @@ class AuthApi {
 
       if (response.statusCode == 200) {
         final info = jsonDecode(response.body);
+        final rawResponse = response.bodyBytes;
+        final responseBody = utf8.decode(rawResponse);
+        final formatted = response.body.replaceAll(r'\_', '_');
+        final info2 = jsonDecode(formatted);
         print('API Response: $info'); // Print the entire response for debugging
+        print('API Response: $info2'); // Print the entire response for debugging
 
         if (info['success'] == true) {
           final userInfo = info['userData'];
@@ -130,6 +137,13 @@ class AuthApi {
       }
     } catch (e) {
       print('Error during API connection: $e');
+
+
+      if (e is FormatException) {
+        print('Format error while parsing JSON');
+      } else {
+        rethrow;
+      }
     }
     return null; // Handle errors as needed
   }
@@ -280,6 +294,7 @@ class AuthApi {
           }).toList();
 
           return fichesPaieList;
+          print(fichesPaieList);
         }
       }
     } catch (e) {
@@ -287,6 +302,54 @@ class AuthApi {
     }
 
     return null; // Gérer les erreurs comme vous le souhaitez
+  }
+  static Future<List<Planning>> fetchPlanningData() async {
+    try {
+      final tokenInfo = tokenVar;
+      final url = 'https://appariteur.com/api/users/planning.php';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenInfo',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final planningData = jsonDecode(response.body);
+
+        if (planningData['success'] == true) {
+          final List<dynamic> eventsDataList = planningData['result'] as List;
+
+          if (eventsDataList.isEmpty) {
+            // Aucun événement à afficher
+            return [];
+          }
+
+          final List<Planning> PlanningList = eventsDataList.map((eventData) {
+            return Planning(
+              prestationId: eventData['prestation_id'],
+              title: eventData['title'],
+              startTime: eventData['startTime'],
+              endTime: eventData['endTime'],
+              lieu: eventData['lieu'],
+              salle: eventData['salle'],
+              duree: eventData['duree'],
+              periode: eventData['periode'],
+              dateEvent: eventData['date_event'],
+              eventColor: eventData['eventColor'],
+              btnCancel: eventData['btnCancel'],
+            );
+          }).toList();
+
+          return PlanningList;
+        }
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion à l\'API des événements : $e');
+    }
+
+    return []; // Gérer les erreurs comme vous le souhaitez
   }
 
 }

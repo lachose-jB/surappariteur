@@ -14,8 +14,9 @@ class ProfileImg extends StatelessWidget {
 
     if (userData != null) {
       return CircleAvatar(
+        radius: 65,
         backgroundImage:
-       Image.network("https://appariteur.com/admins/user_images/"+userData.image,).image,
+        Image.network("https://appariteur.com/admins/user_images/"+userData.image,fit: BoxFit.cover,).image,
         //backgroundImage: AssetImage("assets/images/logo.jpg"),
       );
     } else {
