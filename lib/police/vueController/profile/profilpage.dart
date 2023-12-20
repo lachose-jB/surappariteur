@@ -117,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         controller: nameController,
                         decoration: const InputDecoration(
                           labelText: "Nom",
-                        ),
+                         ),
                         readOnly: !isEditing,
                       ),
                       const SizedBox(height: 10),
