@@ -38,7 +38,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         controller: _tabController,
         children: [
           BodyM(),
-          // L'onglet "Missions à venir" sera vide
+
           Container(),
         ],
       ),

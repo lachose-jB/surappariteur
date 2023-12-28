@@ -49,7 +49,8 @@ class _BodyMState extends State<BodyM> {
           return Text('Erreur lors de la récupération des missions');
         } else if (!snapshot.hasData) {
           print('Aucune mission à afficher');
-          return Text('Aucune mission à afficher');
+          return Center(
+              child:Text('Aucune mission à afficher'));
         } else {
           print('Missions récupérées avec succès');
           MissionEffUser missions = snapshot.data!;

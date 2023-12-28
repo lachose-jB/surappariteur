@@ -16,7 +16,8 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
+    return PreferredSize(preferredSize: const Size.fromHeight(kToolbarHeight*0.5),
+    child: AppBar(
       backgroundColor: Colors.blue,
       elevation: 2,
       shape: const RoundedRectangleBorder(
@@ -74,11 +75,11 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
           Tab(text: 'Missions à venir'),
         ],
       ) : null,
-    );
+    ));
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight*1.2);
 }
 
 

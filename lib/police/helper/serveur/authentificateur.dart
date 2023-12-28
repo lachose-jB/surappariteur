@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
@@ -13,20 +14,27 @@ import '../../acteurs/userdoc.dart';
 
 class AuthApi {
   static UserData? _loggedUserData;
-  static var tokenVar;
+  static String? tokenVar;
+
   static Future<UserData?> login(String email, String password) async {
     try {
-      const url = 'https://appariteur.com/api/user/login.php';
+      const url = 'https://appariteur.com/api/users/login.php';
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'emailUser': email, 'passwordUser': password}),
       );
       if (response.statusCode == 200) {
+        var rawResponse = response.bodyBytes;
+        var responseBody = utf8.decode(rawResponse);
+        print(responseBody);
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
+
           final userData = data['userData'];
           tokenVar = data['token'];
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString('token', tokenVar!);
           print(tokenVar);
           _loggedUserData = UserData(
             userId: userData['user_id'],
@@ -45,7 +53,7 @@ class AuthApi {
             pays: userData['pays'],
             niveau: userData['niveau'],
             user: userData['user'],
-            token: tokenVar, // Ajouter le token au modèle UserData
+            token: prefs.getString('token'), // Ajouter le token au modèle UserData
           );
           return UserData(
             userId: userData['user_id'],
@@ -64,7 +72,7 @@ class AuthApi {
             pays: userData['pays'],
             niveau: userData['niveau'],
             user: userData['user'],
-            token: tokenVar, // Ajouter le token au modèle UserData
+            token: prefs.getString('token'), // Ajouter le token au modèle UserData
           );
 
 
@@ -78,74 +86,63 @@ class AuthApi {
   static UserData? getLoggedUserData() {
     return _loggedUserData;
   }
+  static Future<String?> getTokenFromSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
   static Future<UserInfo?> InfoUser() async {
-    try {
-      final tokenInfo = tokenVar; // Ensure tokenVar is correctly initialized
-      const url = 'https://appariteur.com/api/users/infos_g.php';
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $tokenInfo',
-        },
-      );
+    const url = 'https://appariteur.com/api/users/infos_g.php';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $tokenVar',
+      },
+    );
+  try {
+  final Map<String, dynamic> responseData = jsonDecode(response.body);
+  final Map<String, dynamic> userData = responseData['userData'];
 
-      if (response.statusCode == 200) {
-        final info = jsonDecode(response.body);
-        final rawResponse = response.bodyBytes;
-        final responseBody = utf8.decode(rawResponse);
-        final formatted = response.body.replaceAll(r'\_', '_');
-        final info2 = jsonDecode(formatted);
-        print('API Response: $info'); // Print the entire response for debugging
-        print('API Response: $info2'); // Print the entire response for debugging
+  final List<dynamic> infosPresData = userData['infos_pres'];
+  final List<InfoPres> infosPresList = infosPresData.map((infos) {
+  return InfoPres(
+  jour: infos['jour'],
+  date: infos['date'],
+  matin: infos['matin'],
+  soir: infos['soir'],
+  );
+  }).toList();
 
-        if (info['success'] == true) {
-          final userInfo = info['userData'];
-          final intervalWeekData = userInfo['intervalWeek'];
-          final intervalWeek = IntervalWeek(
-            weekStart: intervalWeekData['week_start'],
-            weekEnd: intervalWeekData['week_end'],
-          );
-          final infosPres = userInfo['infos_pres'] as List<dynamic>;
-          final List<InfoPres> infosPresList = infosPres.map((infos) {
-            return InfoPres(
-              jour: infos['jour'],
-              date: infos['date'],
-              matin: infos['matin'],
-              soir: infos['soir'],
-            );
-          }).toList();
+  final String? heureDays = userData['heure_days'];
+  final String? heureWeek = userData['heure_week'];
+  final String? heureMonth = userData['heure_month'];
+  final String? heureYear = userData['heure_year'];
 
-          final donnees = UserInfo(
-            heureDays: userInfo['heure_days'],
-            heureWeek: userInfo['heure_week'],
-            heureMonth: userInfo['heure_month'],
-            heureYear: userInfo['heure_year'],
-            infosPres: infosPresList,
-            intervalWeek: intervalWeek,
-            effeMis: userInfo['effe_mis'],
-            id_app: null, // There might be a typo here, check the field name
-          );
+  final Map<String, dynamic> intervalWeekData = userData['intervalWeek'];
+  final IntervalWeek intervalWeek = IntervalWeek(
+  weekStart: intervalWeekData['week_start'],
+  weekEnd: intervalWeekData['week_end'],
+  );
 
-          print('Donnees: $donnees'); // Print UserInfo for debugging
-          return donnees;
-        } else {
-          print('API Error: ${info['message']}');
-        }
-      } else {
-        print('API Error - Status Code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error during API connection: $e');
+  final String effeMis = userData['effe_mis'];
 
+  final userInfo = UserInfo(
+  infosPres: infosPresList,
+  heureDays: heureDays,
+  heureWeek: heureWeek,
+  heureMonth: heureMonth,
+  heureYear: heureYear,
+  intervalWeek: intervalWeek,
+  effeMis: effeMis,
+  id_app: null, // Assurez-vous d'ajuster cela selon votre besoin
+  );
 
-      if (e is FormatException) {
-        print('Format error while parsing JSON');
-      } else {
-        rethrow;
-      }
-    }
-    return null; // Handle errors as needed
+  // Utilisez userInfo comme nécessaire
+  } catch (e) {
+  print('Erreur de décodage JSON : $e');
+  }
+
+  return null; // Handle errors as needed
   }
 
 
@@ -192,8 +189,7 @@ class AuthApi {
 
   static Future<MissionEffUser?> UserMission(
       String dateDebuts, String dateFins) async {
-    final tokenInfo =
-        tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+     // Assurez-vous que tokenVar est correctement initialisé
 
     try {
       final url =
@@ -202,12 +198,17 @@ class AuthApi {
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $tokenInfo',
+          'Authorization': 'Bearer $tokenVar',
         },
       );
 
       if (response.statusCode == 200) {
         final docs = jsonDecode(response.body);
+        print(tokenVar);
+
+        var rawResponse = response.bodyBytes;
+        var responseBody = utf8.decode(rawResponse);
+        print(responseBody);
 
         if (docs['success'] == true) {
           final List<dynamic> missions = docs['result'] as List;
@@ -261,18 +262,24 @@ class AuthApi {
   }
   static Future<List<FichePaie>?> getFichesPaie() async {
     try {
-      final tokenInfo = tokenVar; // Assurez-vous que tokenVar est correctement initialisé
+       // Assurez-vous que tokenVar est correctement initialisé
 
       const url = 'https://appariteur.com/api/user/fichepaie.php';
       final response = await http.get(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $tokenInfo',
+          'Authorization': 'Bearer $tokenVar',
         },
       );
 
       if (response.statusCode == 200) {
+
+        var rawResponse = response.bodyBytes;
+
+        var responseBody = utf8.decode(rawResponse);
+
+        print(responseBody);
         final fichesPaieData = jsonDecode(response.body);
 
         if (fichesPaieData['success'] == true) {
@@ -303,21 +310,28 @@ class AuthApi {
 
     return null; // Gérer les erreurs comme vous le souhaitez
   }
-  static Future<List<Planning>> fetchPlanningData() async {
+  static Future<List<Planning>> fetchPlanningData(String startDate, String endDate) async {
     try {
-      final tokenInfo = tokenVar;
+
       final url = 'https://appariteur.com/api/users/planning.php';
       final response = await http.get(
         Uri.parse(url),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $tokenInfo',
+          'Authorization': 'Bearer $tokenVar',
         },
       );
 
       if (response.statusCode == 200) {
         final planningData = jsonDecode(response.body);
+        // Récupérer la réponse brute
+        var rawResponse = response.bodyBytes;
 
+
+        var responseBody = utf8.decode(rawResponse);
+
+
+        print(responseBody);
         if (planningData['success'] == true) {
           final List<dynamic> eventsDataList = planningData['result'] as List;
 
@@ -350,6 +364,17 @@ class AuthApi {
     }
 
     return []; // Gérer les erreurs comme vous le souhaitez
+  }
+  static Future<void> logout() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('token');
+      _loggedUserData = null;
+      tokenVar = null;
+      prefs.clear(); // Efface toutes les préférences partagées si nécessaire
+    } catch (e) {
+      print('Erreur lors de la déconnexion : $e');
+    }
   }
 
 }

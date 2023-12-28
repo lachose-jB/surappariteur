@@ -9,6 +9,7 @@ import 'package:surappariteur/vue/login/loginvue.dart';
 import 'package:surappariteur/vue/notif/notifScreen.dart';
 
 import '../../../vue/parametres/paramettrebody.dart';
+import '../../helper/serveur/authentificateur.dart';
 import 'firscontaint.dart';
 
 class ProfileChild extends StatelessWidget {
@@ -86,16 +87,14 @@ class ProfileChild extends StatelessWidget {
             text: "Déconnexion",
             icon: "assets/icons/Log out.svg",
             press: () async {
-              SharedPreferences share =
-              await SharedPreferences.getInstance();
-              share.clear();
-              // ignore: use_build_context_synchronously
+              await AuthApi.logout();
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const LoginVue()),
               );
             },
           ),
+
         ],
       ),
     );

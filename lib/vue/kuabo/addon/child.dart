@@ -21,7 +21,7 @@ class KuaboChildState extends State<KuaboChild> {
     },
     {
       "text":
-          "Surveillance de vos examens et concours En ligne et \n en présentielle partout en France",
+          "Surveillance de vos examens et concours En ligne et \n en présentiel partout en France",
       "image": "assets/images/splash_2.png"
     },
     {
