@@ -1,157 +1,191 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../../acteurs/planning.dart';
 import '../../helper/serveur/authentificateur.dart';
 
-class PlanningShield extends StatefulWidget {
-  const PlanningShield({Key? key}) : super(key: key);
 
+
+class CustomTableCalendar extends StatefulWidget {
   @override
-  _PlanningShieldState createState() => _PlanningShieldState();
+  _CustomTableCalendarState createState() => _CustomTableCalendarState();
 }
 
-class _PlanningShieldState extends State<PlanningShield> {
-  DateTime? _selectedStartDay;
-  DateTime? _selectedEndDay;
-  CalendarFormat calendarFormat = CalendarFormat.week;
-  Map<DateTime, List<Planning>> _events = {};
-  Set<DateTime> _selectedDates = {};
+class _CustomTableCalendarState extends State<CustomTableCalendar>  with TickerProviderStateMixin {
+  late final ValueNotifier<List<Event>> _events;
+  late AnimationController _animationController;
 
-  Future<void> _handleDaySelected(DateTime day, DateTime focusedDay) async {
-    setState(() {
-      if (_selectedStartDay == null || _selectedEndDay != null) {
-        // Start a new range
-        _selectedStartDay = day;
-        _selectedEndDay = null;
-        _selectedDates = {day};
-      } else {
-        // Complete the range
-        _selectedEndDay = day;
-        _selectedDates = _daysInRange().toSet();
-      }
-    });
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOff;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  DateTime? _rangeStart;
+  DateTime? _rangeEnd;
 
-    // Fetch planning data for the selected date range
-    await _fetchPlanningData();
+  @override
+  void initState() {
+    super.initState();
+    _events = ValueNotifier(_getEventsForDay(DateTime.now()) as List<Event>);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
-  Future<void> _fetchPlanningData() async {
-    if (_selectedStartDay != null && _selectedEndDay != null) {
-      // Fetch planning data for each selected date individually
-      for (DateTime day in _daysInRange()) {
-        await _fetchPlanningDataForDate(day);
-      }
-    }
+  @override
+  void dispose() {
+    _events.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 
-  Future<void> _fetchPlanningDataForDate(DateTime date) async {
+  Future<List<Object?>> _getEventsForDay(DateTime day) async {
     try {
-      final String formattedDate =
-          '${date.year}-${date.month}-${date.day}';
-
-      final planningData =
-      await AuthApi.fetchPlanningData(formattedDate, formattedDate);
-
-      setState(() {
-        _events[date] = planningData;
-      });
+      final events = await AuthApi.getPlanningData();
+      return events?.map((planning) {
+        return Event(
+          date: DateTime.parse(planning.datePres),
+          title: planning.description,
+          color: _getColorFromHex(planning.eventColor),
+          cancelable: planning.btnCancel,
+        );
+      }).toList() ?? [];
     } catch (e) {
-      print('Error fetching planning data for $date: $e');
+      // Handle the error (e.g., show an error message)
+      print('Error fetching planning data: $e');
+      return [];
     }
   }
 
-  List<DateTime> _daysInRange() {
-    // Return a list of days in the selected range
-    List<DateTime> daysInRange = [];
-    if (_selectedStartDay != null && _selectedEndDay != null) {
-      for (DateTime day = _selectedStartDay!;
-      day.isBefore(_selectedEndDay!.add(Duration(days: 1)));
-      day = day.add(Duration(days: 1))) {
-        daysInRange.add(day);
-      }
+
+  Color _getColorFromHex(String hexColor) {
+    hexColor = hexColor.replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor; // 8 char with opacity
     }
-    return daysInRange;
+    return Color(int.parse(hexColor, radix: 16));
   }
 
   @override
   Widget build(BuildContext context) {
-    double _w = MediaQuery.of(context).size.width;
+    return TableCalendar(
+      firstDay: DateTime.utc(2010, 10, 16),
+      lastDay: DateTime.utc(2030, 3, 14),
+      focusedDay: _focusedDay,
+      calendarFormat: _calendarFormat,
+      rangeSelectionMode: _rangeSelectionMode,
+      eventLoader: _getEventsForDay,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      calendarStyle: CalendarStyle(
+        // Use `CalendarStyle` to customize the UI
+        outsideDaysVisible: false,
+      ),
+      onDaySelected: (selectedDay, focusedDay) {
+        if (!isSameDay(_selectedDay, selectedDay)) {
+          setState(() {
+            _selectedDay = selectedDay;
+            _focusedDay = focusedDay;
+            _rangeStart = null; // Important to clean those
+            _rangeEnd = null;
+            _rangeSelectionMode = RangeSelectionMode.toggledOff;
+          });
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 15.0),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: const Text(
-              "Vous pouvez choisir une plage de dates pour indiquer votre disponibilité.",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black,  
-                fontSize: 18.0,
-              ),
-            ),
-          ),
-          const SizedBox(height: 15.0),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black,
-                  offset: Offset(0, 5),
-                  blurRadius: 6.0,
+          _events.value = _getEventsForDay(selectedDay);
+        }
+      },
+      onRangeSelected: (start, end, focusedDay) {
+        setState(() {
+          _selectedDay = null;
+          _focusedDay = focusedDay;
+          _rangeStart = start;
+          _rangeEnd = end;
+          _rangeSelectionMode = RangeSelectionMode.toggledOn;
+        });
+      },
+      onFormatChanged: (format) {
+        if (_calendarFormat != format) {
+          setState(() => _calendarFormat = format);
+        }
+      },
+      onDayLongPressed: (selectedDay) {
+        setState(() {
+          _selectedDay = null;
+          _focusedDay = selectedDay;
+          _rangeStart = null;
+          _rangeEnd = null;
+          _rangeSelectionMode = RangeSelectionMode.toggledOff;
+        });
+      },
+      onHeaderTapped: (focusedDay) {
+        setState(() {
+          _focusedDay = focusedDay;
+        });
+      },
+      calendarBuilders: CalendarBuilders(
+        markerBuilder: (context, date, events) {
+          return events.map((event) {
+            if (event.cancelable) {
+              return Positioned(
+                right: 1,
+                top: 1,
+                child: Icon(
+                  Icons.close,
+                  size: 12.0,
+                  color: Colors.red,
                 ),
-              ],
-            ),
-            child: GestureDetector(
-              onLongPress: () {
-                // Handle long press here
-                print("Long press detected!");
-              },
-              child: TableCalendar(
-                firstDay: DateTime.utc(2023, 1, 1),
-                lastDay: DateTime.utc(2029, 12, 31),
-                focusedDay: _selectedStartDay ?? DateTime.now(),
-                selectedDayPredicate: (day) {
-                  return _selectedDates.contains(day);
-                },
-                onDaySelected: (day, focusedDay) {
-                  _handleDaySelected(day, focusedDay);
-                },
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, day, events) {
-                    final List<Widget> markers = [];
-                    for (var event in events) {
-                      markers.add(
-                        Positioned(
-                          top: 1,
-                          child: Container(
-                            height: 5,
-                            width: 5,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              //color: Color(int.parse('0xFF${event?.eventColor}')),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    return markers.isNotEmpty ? Column(children: markers) : null;
-                  },
+              );
+            }
+          }).toList();
+        },
+        selectedBuilder: (context, date, _) {
+          return FadeTransition(
+            opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _calendarStyle.selectedColor,
+              ),
+              width: 100,
+              height: 100,
+              child: Center(
+                child: Text(
+                  date.day.toString(),
+                  style: TextStyle().copyWith(color: Colors.white),
                 ),
               ),
             ),
-          ),
-        ],
+          );
+        },
+        todayBuilder: (context, date, _) {
+          return Container(
+            margin: const EdgeInsets.all(6.0),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.amber[500],
+              shape: BoxShape.circle,
+            ),
+            width: 100,
+            height: 100,
+            child: Text(
+              date.day.toString(),
+              style: TextStyle().copyWith(color: Colors.white),
+            ),
+          );
+        },
       ),
     );
   }
+}
+
+class Event {
+  final DateTime date;
+  final String title;
+  final Color color;
+  final bool cancelable;
+
+  const Event({
+    required this.date,
+    required this.title,
+    required this.color,
+    required this.cancelable,
+  });
 }

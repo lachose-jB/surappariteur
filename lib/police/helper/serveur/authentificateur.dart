@@ -31,7 +31,7 @@ class AuthApi {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
 
-          final userData = data['userData'];
+          final userData = data['data'];
           tokenVar = data['token'];
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('token', tokenVar!);
@@ -99,51 +99,35 @@ class AuthApi {
         'Authorization': 'Bearer $tokenVar',
       },
     );
-  try {
-  final Map<String, dynamic> responseData = jsonDecode(response.body);
-  final Map<String, dynamic> userData = responseData['userData'];
 
-  final List<dynamic> infosPresData = userData['infos_pres'];
-  final List<InfoPres> infosPresList = infosPresData.map((infos) {
-  return InfoPres(
-  jour: infos['jour'],
-  date: infos['date'],
-  matin: infos['matin'],
-  soir: infos['soir'],
-  );
-  }).toList();
+    try {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final Map<String, dynamic> userData = responseData['data'];
 
-  final String? heureDays = userData['heure_days'];
-  final String? heureWeek = userData['heure_week'];
-  final String? heureMonth = userData['heure_month'];
-  final String? heureYear = userData['heure_year'];
+      final String? heureWeek = userData['heure_week'];
+      final String? heureMonth = userData['heure_month'];
+      final String? heureYear = userData['heure_year'];
 
-  final Map<String, dynamic> intervalWeekData = userData['intervalWeek'];
-  final IntervalWeek intervalWeek = IntervalWeek(
-  weekStart: intervalWeekData['week_start'],
-  weekEnd: intervalWeekData['week_end'],
-  );
 
-  final String effeMis = userData['effe_mis'];
 
-  final userInfo = UserInfo(
-  infosPres: infosPresList,
-  heureDays: heureDays,
-  heureWeek: heureWeek,
-  heureMonth: heureMonth,
-  heureYear: heureYear,
-  intervalWeek: intervalWeek,
-  effeMis: effeMis,
-  id_app: null, // Assurez-vous d'ajuster cela selon votre besoin
-  );
+      final String effeMis = userData['effe_mis'];
 
-  // Utilisez userInfo comme nécessaire
-  } catch (e) {
-  print('Erreur de décodage JSON : $e');
+      final UserInfo userInfo = UserInfo(
+        heureWeek: heureWeek,
+        heureMonth: heureMonth,
+        heureYear: heureYear,
+        effeMis: effeMis,
+
+      );
+      print(userInfo);
+      return userInfo;
+      // Retourne les informations utilisateur
+    } catch (e) {
+      print('Erreur de décodage JSON : $e');
+      return null; // Retourne null en cas d'erreur de décodage JSON
+    }
   }
 
-  return null; // Handle errors as needed
-  }
 
 
   static Future<UserDoc?> DocUser() async {
@@ -262,9 +246,9 @@ class AuthApi {
   }
   static Future<List<FichePaie>?> getFichesPaie() async {
     try {
-       // Assurez-vous que tokenVar est correctement initialisé
+      // Assurez-vous que tokenVar est correctement initialisé
 
-      const url = 'https://appariteur.com/api/user/fichepaie.php';
+      const url = 'https://appariteur.com/api/users/fichepaie.php';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -274,16 +258,10 @@ class AuthApi {
       );
 
       if (response.statusCode == 200) {
-
-        var rawResponse = response.bodyBytes;
-
-        var responseBody = utf8.decode(rawResponse);
-
-        print(responseBody);
-        final fichesPaieData = jsonDecode(response.body);
+        var fichesPaieData = json.decode(utf8.decode(response.bodyBytes));
 
         if (fichesPaieData['success'] == true) {
-          final List<dynamic> fichesPaieInfo = fichesPaieData['result'] as List;
+          final List<dynamic> fichesPaieInfo = fichesPaieData['data'];
 
           if (fichesPaieInfo.isEmpty) {
             // Aucune fiche de paie à afficher
@@ -300,9 +278,11 @@ class AuthApi {
             );
           }).toList();
 
+          print(fichesPaieList); // Vous pouvez imprimer les fichesPaieList ici si nécessaire
           return fichesPaieList;
-          print(fichesPaieList);
         }
+      } else {
+        print('Erreur HTTP lors de la récupération des fiches de paie. Code: ${response.statusCode}');
       }
     } catch (e) {
       print('Erreur lors de la connexion à l\'API pour les fiches de paie : $e');
@@ -310,10 +290,15 @@ class AuthApi {
 
     return null; // Gérer les erreurs comme vous le souhaitez
   }
-  static Future<List<Planning>> fetchPlanningData(String startDate, String endDate) async {
-    try {
 
-      final url = 'https://appariteur.com/api/users/planning.php';
+  static Future<List<Planning>?> getPlanningData() async {
+    try {
+      if (tokenVar == null) {
+        print('Error: Token is null');
+        return null;
+      }
+
+      const url = 'https://appariteur.com/api/users/planning.php';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -323,48 +308,30 @@ class AuthApi {
       );
 
       if (response.statusCode == 200) {
-        final planningData = jsonDecode(response.body);
-        // Récupérer la réponse brute
-        var rawResponse = response.bodyBytes;
+        final List<dynamic> planningData = jsonDecode(response.body);
 
-
-        var responseBody = utf8.decode(rawResponse);
-
-
-        print(responseBody);
-        if (planningData['success'] == true) {
-          final List<dynamic> eventsDataList = planningData['result'] as List;
-
-          if (eventsDataList.isEmpty) {
-            // Aucun événement à afficher
-            return [];
-          }
-
-          final List<Planning> PlanningList = eventsDataList.map((eventData) {
-            return Planning(
-              prestationId: eventData['prestation_id'],
-              title: eventData['title'],
-              startTime: eventData['startTime'],
-              endTime: eventData['endTime'],
-              lieu: eventData['lieu'],
-              salle: eventData['salle'],
-              duree: eventData['duree'],
-              periode: eventData['periode'],
-              dateEvent: eventData['date_event'],
-              eventColor: eventData['eventColor'],
-              btnCancel: eventData['btnCancel'],
-            );
+        if (planningData.isNotEmpty) {
+          final List<Planning> eventsList = planningData.map((eventData) {
+            return Planning.fromJson(eventData);
           }).toList();
-
-          return PlanningList;
+          print(eventsList);
+          return eventsList;
+        } else {
+          print('Planning data is empty');
+          return <Planning>[];
         }
+      } else {
+        print('Failed to fetch planning data. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Erreur lors de la connexion à l\'API des événements : $e');
+      print('Error fetching planning data: $e');
     }
 
-    return []; // Gérer les erreurs comme vous le souhaitez
+    return null;
   }
+
+
+
   static Future<void> logout() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

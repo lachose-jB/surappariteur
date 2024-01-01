@@ -24,7 +24,7 @@ class MissionListScreen extends StatelessWidget {
 
           return Card(
             child: ListTile(
-              title: Text(planning.title),
+              title: Text(planning.salle),
               subtitle: Text(planning.lieu),
               trailing: Text(planning.duree.toString()), // Assurez-vous de convertir en String si nécessaire
             ),

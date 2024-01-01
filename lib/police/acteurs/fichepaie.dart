@@ -1,5 +1,5 @@
 class FichePaie {
-  final int id;
+  final String id;
   final String mois;
   final String annee;
   final String fichier;
@@ -15,7 +15,7 @@ class FichePaie {
 
   factory FichePaie.fromJson(Map<String, dynamic> json) {
     return FichePaie(
-      id: json['id'] as int,
+      id: json['id'] as String,
       mois: json['mois'] as String,
       annee: json['annee'] as String,
       fichier: json['fichier'] as String,
