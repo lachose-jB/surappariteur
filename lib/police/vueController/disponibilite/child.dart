@@ -31,8 +31,6 @@ class _DisponibliteScreenState extends State<DisponibiliteScreen> {
         _selectedDates = _daysInRange().toSet();
       }
     });
-
-    // Fetch planning data for the selected date range
     await _fetchPlanningData();
   }
 
@@ -86,14 +84,14 @@ class _DisponibliteScreenState extends State<DisponibiliteScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.white70,
+              color: Color(0xFF31393C),
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: const Text(
               "Vous pouvez choisir une plage de dates pour indiquer votre disponibilité.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.black,  
+                color: Colors.white,
                 fontSize: 18.0,
               ),
             ),

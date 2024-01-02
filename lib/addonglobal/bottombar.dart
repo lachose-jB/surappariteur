@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:surappariteur/vue/disponibilite/dispovue.dart';
 import 'package:surappariteur/vue/fichepaie/fichevue.dart';
 import 'package:surappariteur/vue/home/homevue.dart';
 
@@ -83,9 +84,9 @@ class MyBottomNavState extends State<MyBottomNav> {
   Widget getSelectedWidget({required int index}) {
     switch (index) {
       case 1:
-        return PlanningScreen();
+        return DispoScreen();
       case 2:
-        return const MissionScreen();
+        return const HomeScreen();
       case 3:
         return const FicheVue();
       case 4:
