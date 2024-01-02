@@ -138,7 +138,6 @@ class _DisponibliteScreenState extends State<DisponibiliteScreen> {
                             width: 5,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              //color: Color(int.parse('0xFF${event?.eventColor}')),
                             ),
                           ),
                         ),

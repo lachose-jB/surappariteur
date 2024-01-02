@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:surappariteur/police/vueController/contratController/contratChild.dart';
 import 'package:surappariteur/police/vueController/profile/profileimg.dart';
 import 'package:surappariteur/police/vueController/profile/profilpage.dart';
 import 'package:surappariteur/vue/aide/aidebody.dart';
@@ -49,7 +50,7 @@ class ProfileChild extends StatelessWidget {
             press: () => {
               Navigator.push(
                 context,
-                SlideTransition1(ContraBody()),
+                SlideTransition1(ContratChild()),
               ),
             },
           ),

@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../acteurs/fichepaie.dart';
 import '../../helper/serveur/authentificateur.dart';
 
-
 class FichesPaieChild extends StatefulWidget {
-@override
-_FichesPaieChildState createState() => _FichesPaieChildState();
+  @override
+  _FichesPaieChildState createState() => _FichesPaieChildState();
 }
 
 class _FichesPaieChildState extends State<FichesPaieChild> {
-
   List<FichePaie>? fichesPaie;
-  bool isLoading = false;
 
   @override
   void initState() {
@@ -21,24 +19,14 @@ class _FichesPaieChildState extends State<FichesPaieChild> {
     loadFichesPaie();
   }
 
-
   Future<void> loadFichesPaie() async {
-
     print('Chargement des fiches paie...');
-    setState(() {
-      isLoading = true;
-    });
-
     final loadedFichesPaie = await AuthApi.getFichesPaie();
-
     print('Fiches de paies chargées:');
     print(loadedFichesPaie);
-
     setState(() {
       fichesPaie = loadedFichesPaie;
-      isLoading = false;
     });
-
   }
 
   @override
@@ -46,31 +34,41 @@ class _FichesPaieChildState extends State<FichesPaieChild> {
     double _w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : fichesPaie == null
-          ? Center(child: Text("Pas de fiches"))
-          : AnimationLimiter(
-        child: ListView.builder(
-          itemCount: fichesPaie!.length,
-          padding: EdgeInsets.all(_w / 30),
-          physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
-          itemBuilder: (BuildContext c, int i) {
-            final fiche = fichesPaie![i];
-            return AnimationConfiguration.staggeredList(
-              position: i,
-              delay: const Duration(milliseconds: 100),
-              child: SlideAnimation(
-                duration: const Duration(milliseconds: 2500),
-                curve: Curves.fastLinearToSlowEaseIn,
-                horizontalOffset: 30,
-                verticalOffset: 300.0,
-                child: ListItem(width: _w, fiche: fiche),
+      body: FutureBuilder<List<FichePaie>?>(
+        future: AuthApi.getFichesPaie(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Erreur de chargement des fiches'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("Pas de fiches"));
+          } else {
+            return AnimationLimiter(
+              child: ListView.builder(
+                itemCount: snapshot.data!.length,
+                padding: EdgeInsets.all(_w / 30),
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                itemBuilder: (BuildContext c, int i) {
+                  final fiche = snapshot.data![i];
+                  return AnimationConfiguration.staggeredList(
+                    position: i,
+                    delay: const Duration(milliseconds: 100),
+                    child: SlideAnimation(
+                      duration: const Duration(milliseconds: 2500),
+                      curve: Curves.fastLinearToSlowEaseIn,
+                      horizontalOffset: 30,
+                      verticalOffset: 300.0,
+                      child: ListItem(width: _w, fiche: fiche),
+                    ),
+                  );
+                },
               ),
             );
-          },
-        ),
+          }
+        },
       ),
     );
   }
@@ -81,6 +79,18 @@ class ListItem extends StatelessWidget {
   final FichePaie fiche;
 
   ListItem({required this.width, required this.fiche});
+
+  Future<void> downloadFiche(String fileName) async {
+    final downloadUrl = 'https://appariteur.com/admins/documents/$fileName';
+
+    // Ajoutez le schéma du lien (http:// ou https://) pour garantir que canLaunch fonctionne correctement
+    if (await canLaunch('http://$downloadUrl') || await canLaunch('https://$downloadUrl')) {
+      await launch(downloadUrl);
+    } else {
+      print('Could not launch $downloadUrl');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,8 +119,7 @@ class ListItem extends StatelessWidget {
           subtitle: Text('Date de création: ${fiche.dateCreate}'),
           trailing: ElevatedButton(
             onPressed: () {
-              // Ajoutez ici la logique pour télécharger la fiche
-              // Vous pouvez utiliser le package 'url_launcher' pour ouvrir le lien dans le navigateur ou 'http' pour télécharger le fichier
+              downloadFiche(fiche.fichier);
             },
             child: Text('Télécharger'),
           ),

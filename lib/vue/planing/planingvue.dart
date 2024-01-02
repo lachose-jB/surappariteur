@@ -19,7 +19,7 @@ class PlanningScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Mes Disponibilités", // Pass the page name here
+        PageName: "Mon Planning", // Pass the page name here
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(

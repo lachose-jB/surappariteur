@@ -1,19 +1,19 @@
-class Alldoc {
-  final id;
-  final String typeDoc;
-  final String description;
-  final String lienDoc;
-
-  Alldoc({
-    required this.id,
-    required this.typeDoc,
-    required this.description,
-    required this.lienDoc,
-  });
-}
-
 class UserDoc {
-  final List<Alldoc> alldoc;
+  final String docId;
+  final String typeDoc;
+  final String docName;
 
-  UserDoc({required this.alldoc});
+  UserDoc({
+    required this.docId,
+    required this.typeDoc,
+    required this.docName,
+  });
+
+  factory UserDoc.fromJson(Map<String, dynamic> json) {
+    return UserDoc(
+      docId: json['doc_id'],
+      typeDoc: json['type_doc'],
+      docName: json['doc_name'],
+    );
+  }
 }

@@ -29,8 +29,8 @@ class MyBottomNavState extends State<MyBottomNav> {
   @override
   Widget build(BuildContext context) {
     const items = [
-      Icon(Icons.home, size: 30, color: Colors.blueGrey),
       Icon(Icons.calendar_month, size: 30, color: Colors.blueGrey),
+      Icon(Icons.add_business, size: 30, color: Colors.blueGrey),
       Icon(Icons.table_rows_sharp, size: 30, color: Colors.blueGrey),
       Icon(Icons.account_balance, size: 30, color: Colors.blueGrey),
       Icon(Icons.person, size: 30, color: Colors.blueGrey)
@@ -91,7 +91,7 @@ class MyBottomNavState extends State<MyBottomNav> {
       case 4:
         return const ProfileVue();
       default:
-        return const HomeScreen();
+        return PlanningScreen();
     }
   }
 }

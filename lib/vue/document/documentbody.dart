@@ -17,7 +17,7 @@ class DocumentShild extends StatefulWidget {
 }
 
 class _DocumentShildState extends State<DocumentShild> {
-  List<Alldoc> userDocs = [];
+  List<UserDoc> userDocs = [];
 
   @override
   void initState() {
@@ -26,10 +26,10 @@ class _DocumentShildState extends State<DocumentShild> {
   }
 
   Future<void> ShowUserDoc() async {
-    final userDoc = await AuthApi.DocUser();
+    final userDoc = await AuthApi.getUserDocuments();
     if (userDoc != null) {
       setState(() {
-        userDocs = userDoc.alldoc;
+        userDocs = userDoc.toList();
       });
     } else {
       // Handle the failed connection here
@@ -82,7 +82,7 @@ class _DocumentShildState extends State<DocumentShild> {
 }
 
 class ListItem extends StatelessWidget {
-  final Alldoc doc;
+  final UserDoc doc;
   const ListItem({
     required Key? key,
     required this.doc,
@@ -90,7 +90,7 @@ class ListItem extends StatelessWidget {
   }) : super(key: key);
 
   Future<void> _openPDF() async {
-    final url = doc.lienDoc; // URL du document PDF
+    final url = 'https://appariteur.com/admins/documents/'+doc.docName; // URL du document PDF
     if (await canLaunch(url)) {
       await launch(url);
     } else {

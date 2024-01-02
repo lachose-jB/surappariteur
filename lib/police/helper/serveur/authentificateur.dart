@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
+import '../../acteurs/contrat.dart';
 import '../../acteurs/fichepaie.dart';
 import '../../acteurs/planning.dart';
 import '../../acteurs/user.dart';
@@ -130,45 +131,29 @@ class AuthApi {
 
 
 
-  static Future<UserDoc?> DocUser() async {
-    late var tokenInfo;
+  static Future<List<UserDoc>?> getUserDocuments() async {
     try {
-      tokenInfo =
-          tokenVar; // Assurez-vous que tokenVar est correctement initialisé
-
-      const url = 'https://appariteur.com/api/users/document.php';
       final response = await http.get(
-        Uri.parse(url),
+        Uri.parse('https://appariteur.com/api/users/document.php'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $tokenInfo',
+          'Authorization': 'Bearer $tokenVar',
         },
       );
 
       if (response.statusCode == 200) {
-        final docs = jsonDecode(response.body);
-        if (docs['success'] == true) {
-          final List<dynamic> docInfo = docs['result'] as List;
-          print(docInfo);
-          print("+++++++++++++++++++++++++++++++++++++++++++");
-          final List<Alldoc> alldocList = docInfo.map((infos) {
-            return Alldoc(
-              id: infos['id'],
-              typeDoc: infos['type_doc'],
-              description: infos['description'] ??
-                  'No description available', // Provide a default value
-              lienDoc: infos['lien_doc'],
-            );
-          }).toList();
-          return UserDoc(
-            alldoc: alldocList,
-          );
-        }
+        final List<dynamic> documentsData = jsonDecode(response.body)['data'];
+
+        final List<UserDoc> documentsList =
+        documentsData.map((data) => UserDoc.fromJson(data)).toList();
+
+        return documentsList;
       }
     } catch (e) {
-      print('Erreur lors de la connexion à l\'API : $e');
+      print('Erreur lors de la récupération des documents : $e');
     }
-    return null; // Gérer les erreurs comme vous le souhaitez
+
+    return null;
   }
 
   static Future<MissionEffUser?> UserMission(
@@ -329,6 +314,61 @@ class AuthApi {
 
     return null;
   }
+  static Future<List<Contrat>?> getContrats() async {
+    try {
+      if (tokenVar == null) {
+        print('Error: Token is null');
+        return null;
+      }
+
+      const url = 'https://appariteur.com/api/users/contrats.php'; // Remplacez par l'URL réelle de votre API pour récupérer les contrats
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenVar',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var contratsData = json.decode(utf8.decode(response.bodyBytes));
+
+        if (contratsData['success'] == true) {
+          final List<dynamic> contratsInfo = contratsData['data'];
+
+          if (contratsInfo.isEmpty) {
+            // Aucun contrat à afficher
+            return null;
+          }
+
+          final List<Contrat> contratsList = contratsInfo.map((contratData) {
+            return Contrat(
+              idContratApp: contratData['Id_contrat_app'],
+              appariteurId: contratData['appariteur_id'],
+              typeContrat: contratData['TypeContrat'],
+              dateEmbauche: contratData['DateEmbauche'],
+              dateFinContrat: contratData['DateFinContrat'],
+              dateEdition: contratData['DateEdition'],
+              disponibilite: contratData['Disponibilite'],
+              nbrHeure: contratData['nbr_heure'],
+              montantHeure: contratData['montant_heure'],
+              nameFichier: contratData['name_fichier'],
+            );
+          }).toList();
+
+          print(contratsList); // Vous pouvez imprimer les contratsList ici si nécessaire
+          return contratsList;
+        }
+      } else {
+        print('Erreur HTTP lors de la récupération des contrats. Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur lors de la connexion à l\'API pour les contrats : $e');
+    }
+
+    return null; // Gérer les erreurs comme vous le souhaitez
+  }
+
 
 
 
