@@ -33,7 +33,6 @@ class MyBottomNavState extends State<MyBottomNav> {
       Icon(Icons.calendar_month, size: 30, color: Colors.blueGrey),
       Icon(Icons.add_business, size: 30, color: Colors.blueGrey),
       Icon(Icons.table_rows_sharp, size: 30, color: Colors.blueGrey),
-      Icon(Icons.account_balance, size: 30, color: Colors.blueGrey),
       Icon(Icons.person, size: 30, color: Colors.blueGrey)
     ];
     return Scaffold(
@@ -70,9 +69,6 @@ class MyBottomNavState extends State<MyBottomNav> {
         _backgroundColor = Colors.grey;
         break;
       case 3:
-        _backgroundColor = Colors.grey;
-        break;
-      case 4:
         _backgroundColor = Colors.blue;
         break;
       default:
@@ -87,9 +83,8 @@ class MyBottomNavState extends State<MyBottomNav> {
         return DispoScreen();
       case 2:
         return const HomeScreen();
-      case 3:
-        return const FicheVue();
-      case 4:
+
+      case 3 :
         return const ProfileVue();
       default:
         return PlanningScreen();

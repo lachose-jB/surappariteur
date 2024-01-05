@@ -8,6 +8,7 @@ import 'package:surappariteur/police/acteurs/missionuser.dart';
 import 'package:surappariteur/police/acteurs/userinfo.dart';
 
 import '../../acteurs/contrat.dart';
+import '../../acteurs/disponibilites.dart';
 import '../../acteurs/fichepaie.dart';
 import '../../acteurs/planning.dart';
 import '../../acteurs/user.dart';
@@ -156,13 +157,10 @@ class AuthApi {
     return null;
   }
 
-  static Future<MissionEffUser?> UserMission(
-      String dateDebuts, String dateFins) async {
-     // Assurez-vous que tokenVar est correctement initialisé
 
+  static Future<MissionEffUser?> UserMission(String dateDebuts, String dateFins) async {
     try {
-      final url =
-          'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateDebuts&date_end=$dateFins';
+      final url = 'https://appariteur.com/api/users/missioneffectuee.php?date_start=$dateDebuts&date_end=$dateFins';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -172,62 +170,28 @@ class AuthApi {
       );
 
       if (response.statusCode == 200) {
-        final docs = jsonDecode(response.body);
-        print(tokenVar);
+        // Attempt to correct the malformed JSON response
+        String responseBody = response.body;
+        int splitIndex = responseBody.indexOf('}}{') + 2; // Finds the index where the split should occur
+        String firstJsonString = responseBody.substring(0, splitIndex) + "}"; // Corrects the first JSON part
+        String secondJsonString = "{" + responseBody.substring(splitIndex + 1); // Corrects the second JSON part
 
-        var rawResponse = response.bodyBytes;
-        var responseBody = utf8.decode(rawResponse);
-        print(responseBody);
+        // Parse each JSON string
+        var firstJson = jsonDecode(firstJsonString);
+        var secondJson = jsonDecode(secondJsonString);
 
-        if (docs['success'] == true) {
-          final List<dynamic> missions = docs['result'] as List;
-
-          if (missions.isEmpty) {
-            // Aucune mission à afficher
-            return null;
-          }
-
-          final List<Mission> missionList = missions.map((missionData) {
-            String date = missionData['date'] ?? 'null';
-            String reference = missionData['reference'] ?? 'null';
-            String etabli = missionData['etabli'] ?? 'null';
-            String duree = missionData['duree'] ?? 'null';
-
-            return Mission(
-              date: date,
-              reference: reference,
-              etabli: etabli,
-              duree: duree,
-            );
-          }).toList();
-
-          final month = docs['month'];
-          final monthyear = docs['monthyear'];
-          final sumHeure = docs['sum_heure'];
-          final lastyear = docs['lastyear'];
-
-          final List<dynamic> yearsData = docs['years'] as List;
-          final List<Year> yearList = yearsData.map((yearData) {
-            return Year(
-              year: yearData['year'],
-            );
-          }).toList();
-
-          return MissionEffUser(
-            missionList: missionList,
-            month: month,
-            monthyear: monthyear,
-            sum_heure: sumHeure,
-            lastyear: lastyear,
-            years: yearList,
-          );
+        // Combine the relevant data into a single object as expected by the model
+        if (secondJson['success'] == true) {
+          return MissionEffUser.fromJson({
+            'missions': secondJson['data'],
+            'totalHeure': secondJson['total_heure']
+          });
         }
       }
     } catch (e) {
-      print('Erreur lors de la connexion à l\'API : $e');
+      print('Error while connecting to the API: $e');
     }
-
-    return null; // Gérer les erreurs comme vous le souhaitez
+    return null;
   }
   static Future<List<FichePaie>?> getFichesPaie() async {
     try {
@@ -321,7 +285,7 @@ class AuthApi {
         return null;
       }
 
-      const url = 'https://appariteur.com/api/users/contrats.php'; // Remplacez par l'URL réelle de votre API pour récupérer les contrats
+      const url = 'https://appariteur.com/api/users/contrat.php';
       final response = await http.get(
         Uri.parse(url),
         headers: {
@@ -369,7 +333,80 @@ class AuthApi {
     return null; // Gérer les erreurs comme vous le souhaitez
   }
 
+  static Future<void> sendDisponibilites(List<Map<String, dynamic>> disponibilites) async {
+    try {
+      // Vérification du token
+      if (tokenVar == null) {
+        print('Error: Token is null');
+        return;
+      }
+      const url = 'https://appariteur.com/api/users/disponibilites.php';
+      final Map<String, dynamic> requestBody = {'updates': disponibilites};
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenVar',
+        },
+        body: jsonEncode(requestBody),
+      );
 
+      // Traitement de la réponse
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print('Disponibilités ajoutées avec succès');
+        } else {
+          print('Erreur lors de l\'ajout des disponibilités');
+        }
+      } else {
+        print('Failed to add disponibilites. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending disponibilites: $e');
+    }
+  }
+  static Future<List<Disponibilite>?> getDisponibilites() async {
+    if (tokenVar == null) {
+      print('Error: Token is null');
+      return null;
+    }
+
+    const url = 'https://appariteur.com/api/users/disponibilites.php';
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenVar',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        var disponibilitesData = json.decode(utf8.decode(response.bodyBytes));
+        if (disponibilitesData['success'] == true) {
+          final List<dynamic> disponibilitesInfo = disponibilitesData['result'];
+
+          if (disponibilitesInfo.isEmpty) {
+            return null;
+          }
+
+          final List<Disponibilite> disponibilitesList = disponibilitesInfo.map((disponibiliteData) {
+            return Disponibilite.fromJson(disponibiliteData);
+          }).toList();
+
+          print(disponibilitesList); // For debug
+          return disponibilitesList;
+        }
+      } else {
+        print('HTTP Error while fetching disponibilites. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error connecting to the API for disponibilites: $e');
+    }
+
+    return null; // Handle errors as you wish
+  }
 
 
   static Future<void> logout() async {

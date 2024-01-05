@@ -6,6 +6,7 @@ import 'package:surappariteur/police/vueController/profile/profilpage.dart';
 import 'package:surappariteur/vue/aide/aidebody.dart';
 import 'package:surappariteur/vue/contrat/contrabody.dart';
 import 'package:surappariteur/vue/document/documentbody.dart';
+import 'package:surappariteur/vue/fichepaie/fichevue.dart';
 import 'package:surappariteur/vue/login/loginvue.dart';
 import 'package:surappariteur/vue/notif/notifScreen.dart';
 
@@ -34,7 +35,7 @@ class ProfileChild extends StatelessWidget {
               Navigator.push(context, SlideTransition1(const ProfilePage())),
             },
           ),
-          FirsContentPro(
+        /*  FirsContentPro(
             text: "Notifications",
             icon: "assets/icons/Bell.svg",
             press: () => {
@@ -43,19 +44,29 @@ class ProfileChild extends StatelessWidget {
                 SlideTransition1(NotifScreen()),
               ),
             },
-          ),
+          ),*/
           FirsContentPro(
-            text: "Contrat",
+            text: "Contrats",
             icon: "assets/icons/task.svg",
             press: () => {
               Navigator.push(
                 context,
-                SlideTransition1(ContratChild()),
+                SlideTransition1(ContratVue()),
               ),
             },
           ),
           FirsContentPro(
-            text: "Document",
+            text: "Fiches de Paie",
+            icon: "assets/icons/task.svg",
+            press: () => {
+              Navigator.push(
+                context,
+                SlideTransition1(FicheVue()),
+              ),
+            },
+          ),
+          FirsContentPro(
+            text: "Documents",
             icon: "assets/icons/doc.svg",
             press: () => {
               Navigator.push(
@@ -64,7 +75,7 @@ class ProfileChild extends StatelessWidget {
               ),
             },
           ),
-          FirsContentPro(
+         /* FirsContentPro(
             text: "Paramètres",
             icon: "assets/icons/Settings.svg",
             press: () => {
@@ -83,7 +94,7 @@ class ProfileChild extends StatelessWidget {
                 SlideTransition1(AideBody()),
               ),
             },
-          ),
+          ),*/
           FirsContentPro(
             text: "Déconnexion",
             icon: "assets/icons/Log out.svg",

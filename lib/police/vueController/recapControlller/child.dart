@@ -43,188 +43,188 @@ class _HomeChildState extends State<HomeChild> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: const Text(
-                  "Nombres d'heures de prestation",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18.0,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: const Text(
+                    "Nombres d'heures de prestation",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18.0,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 40.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset(
-                      "assets/images/mission.png",
-                      height: 50,
-                    ),
-                    Container(
-                      width: 140.0, // Ajoutez la largeur fixe de 60
-                      child: Container(
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.redAccent,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.0,
-                              spreadRadius: 0.0,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              heure_Week,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
+                const SizedBox(height: 40.0),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(
+                        "assets/images/mission.png",
+                        height: 50,
+                      ),
+                      Container(
+                        width: 140.0, // Ajoutez la largeur fixe de 60
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.redAccent,
+                                offset: Offset(0, 2),
+                                blurRadius: 6.0,
+                                spreadRadius: 0.0,
                               ),
-                            ),
-                            const SizedBox(height: 5.0),
-                            const Text(
-                              "Cette semaine",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.0,
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                heure_Week,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18.0,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 5.0),
+                              const Text(
+                                "Cette semaine",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset(
-                      "assets/images/mission.png",
-                      height: 50,
-                    ),
-                    Container(
-                      width: 140.0, // Ajoutez la largeur fixe de 60
-                      child: Container(
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.redAccent,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.0,
-                              spreadRadius: 0.0,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              heure_Month,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
+                const SizedBox(height: 20.0),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(
+                        "assets/images/mission.png",
+                        height: 50,
+                      ),
+                      Container(
+                        width: 140.0, // Ajoutez la largeur fixe de 60
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.redAccent,
+                                offset: Offset(0, 2),
+                                blurRadius: 6.0,
+                                spreadRadius: 0.0,
                               ),
-                            ),
-                            const SizedBox(height: 5.0),
-                            const Text(
-                              "Ce mois",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.0,
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                heure_Month,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18.0,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 5.0),
+                              const Text(
+                                "Ce mois",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Image.asset(
-                      "assets/images/mission.png",
-                      height: 50,
-                    ),
-                    Container(
-                      width: 140.0, // Ajoutez la largeur fixe de 60
-                      child: Container(
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.redAccent,
-                              offset: Offset(0, 2),
-                              blurRadius: 6.0,
-                              spreadRadius: 0.0,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              heure_Year,
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18.0,
+                const SizedBox(height: 20.0),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white70,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(
+                        "assets/images/mission.png",
+                        height: 50,
+                      ),
+                      Container(
+                        width: 140.0, // Ajoutez la largeur fixe de 60
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.redAccent,
+                                offset: Offset(0, 2),
+                                blurRadius: 6.0,
+                                spreadRadius: 0.0,
                               ),
-                            ),
-                            const SizedBox(height: 5.0),
-                            const Text(
-                              "Cette année",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15.0,
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                heure_Year,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18.0,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 5.0),
+                              const Text(
+                                "Cette année",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 30.0),
+                const SizedBox(height: 30.0),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16.0),

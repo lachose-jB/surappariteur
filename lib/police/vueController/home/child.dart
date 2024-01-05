@@ -231,23 +231,6 @@ class _HomeChildState extends State<HomeChild> {
                 ),
               ),
               const SizedBox(height: 30.0),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: const Text(
-                  "Planning des missions du mois",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18.0,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30.0),
 
             ],
           ),

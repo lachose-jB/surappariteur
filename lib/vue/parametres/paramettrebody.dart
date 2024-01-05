@@ -21,7 +21,7 @@ class _ParrametreState extends State<Parrametre> {
           ? const Center(
               // Display message in the center of the page
               child: Text(
-                "Pas de parametre de configuration",
+                "Page en cours de construction",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             )

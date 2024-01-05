@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../police/vueController/missioncontroler/newMission.dart';
 
@@ -27,10 +28,12 @@ class TopBarS extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: Text(
         PageName,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
+        style: GoogleFonts.raleway(
+          textStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       automaticallyImplyLeading: false, // Désactive le bouton de retour

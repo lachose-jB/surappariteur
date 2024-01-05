@@ -1,108 +1,170 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class DispoNew extends StatefulWidget {
-  const DispoNew({Key? key});
+import 'package:surappariteur/police/helper/serveur/authentificateur.dart';
+
+class MyForm extends StatefulWidget {
+  final List<DateTime> selectedDates; // Add this line
+
+  MyForm({Key? key, required this.selectedDates}) : super(key: key); // Add this constructor
 
   @override
-  State<DispoNew> createState() => _DispoNewState();
+  _MyFormState createState() => _MyFormState();
 }
+class _MyFormState extends State<MyForm> {
+  final List<Map<String, dynamic>> disponibilites = [];
 
-class _DispoNewState extends State<DispoNew> {
-  final List<DateTime> _selectedDates = [];
-  final TextEditingController _heuresController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTimeMorningBegin = const TimeOfDay(hour: 8, minute: 0);
+  TimeOfDay selectedTimeMorningEnd = const TimeOfDay(hour: 13, minute: 0);
+  TimeOfDay selectedTimeEveningBegin = const TimeOfDay(hour: 14, minute: 0);
+  TimeOfDay selectedTimeEveningEnd = const TimeOfDay(hour: 17, minute: 0);
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = (await showDatePicker(
+  void _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    ))!;
+      initialDate: selectedDate,
+      firstDate: DateTime(2022),
+      lastDate: DateTime(2025),
+    );
 
-    if (picked != null) {
+    if (pickedDate != null && pickedDate != selectedDate) {
       setState(() {
-        _selectedDates.add(picked);
+        selectedDate = pickedDate;
       });
     }
   }
 
-  Future<void> _selectHeures(BuildContext context) async {
-    final TimeOfDay picked = (await showTimePicker(
+  void _selectTime(
+      BuildContext context, bool isMorning, bool isStartTime) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
-    ))!;
+      initialTime:
+      isMorning ? selectedTimeMorningBegin : selectedTimeEveningBegin,
+    );
 
-    setState(() {
-      _heuresController.text = picked.format(context);
-    });
+    if (pickedTime != null) {
+      setState(() {
+        if (isMorning) {
+          if (isStartTime) {
+            selectedTimeMorningBegin = pickedTime;
+          } else {
+            selectedTimeMorningEnd = pickedTime;
+          }
+        } else {
+          if (isStartTime) {
+            selectedTimeEveningBegin = pickedTime;
+          } else {
+            selectedTimeEveningEnd = pickedTime;
+          }
+        }
+      });
+    }
   }
+
+  void _submitForm() async {
+    // Formatage de la date
+    final String formattedDate =
+    DateFormat('yyyy-MM-dd').format(selectedDate);
+
+    // Formatage des heures
+    final String formattedMorningBegin =
+    _formatTime(selectedTimeMorningBegin);
+    final String formattedMorningEnd =
+    _formatTime(selectedTimeMorningEnd);
+    final String formattedEveningBegin =
+    _formatTime(selectedTimeEveningBegin);
+    final String formattedEveningEnd =
+    _formatTime(selectedTimeEveningEnd);
+
+    // Création de la structure de données
+    Map<String, dynamic> disponibilite = {
+      "date": formattedDate,
+      "heure_debutMatin": formattedMorningBegin,
+      "heure_finMatin": formattedMorningEnd,
+      "heure_debutSoir": formattedEveningBegin,
+      "heure_finSoir": formattedEveningEnd,
+    };
+
+    // Ajout à la liste
+    setState(() {
+      disponibilites.add(disponibilite);
+    });
+
+
+    await AuthApi.sendDisponibilites(disponibilites);
+  }
+
+  String _formatTime(TimeOfDay timeOfDay) {
+    final now = DateTime.now();
+    final dateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      timeOfDay.hour,
+      timeOfDay.minute,
+    );
+    return DateFormat('HH:mm:ss').format(dateTime);
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Enregistrer vos Disponibilité'),
+        title: const Text('Formulaire de disponibilité'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Dates
-              Column(
-                children: _selectedDates.map((date) {
-                  return ListTile(
-                    title: Text(DateFormat('dd/MM/yyyy').format(date)),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          _selectedDates.remove(date);
-                        });
-                      },
-                    ),
-                  );
-                }).toList(),
-              ),
-              ElevatedButton(
-                onPressed: () => _selectDate(context),
-                child: const Text('Ajouter une date'),
-              ),
-              // Heures
-              TextFormField(
-                controller: _heuresController,
-                onTap: () => _selectHeures(context),
-                decoration: InputDecoration(
-                  labelText: 'Heures',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.access_time),
-                    onPressed: () => _selectHeures(context),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Submit the form here
-                },
-                child: const Text('Enregistrer'),
-              ),
-            ],
-          ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: const Text('Sélectionner la date'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, true, true),
+              child: const Text('Heure début (matin)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, true, false),
+              child: const Text('Heure fin (matin)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, false, true),
+              child: const Text('Heure début (soir)'),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, false, false),
+              child: const Text('Heure fin (soir)'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _submitForm,
+              child: const Text('Soumettre'),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Dernières mises à jour : ${disponibilites.toString()}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Sélection actuelle : \n'
+                  'Date : ${DateFormat('dd-MM-yyyy').format(selectedDate)}\n'
+                  'Heure début (matin) : ${_formatTime(selectedTimeMorningBegin)}\n'
+                  'Heure fin (matin) : ${_formatTime(selectedTimeMorningEnd)}\n'
+                  'Heure début (soir) : ${_formatTime(selectedTimeEveningBegin)}\n'
+                  'Heure fin (soir) : ${_formatTime(selectedTimeEveningEnd)}',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ],
         ),
       ),
     );

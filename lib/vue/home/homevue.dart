@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:surappariteur/police/vueController/home/child.dart';
+import 'package:surappariteur/vue/mission/missionvue.dart';
 
 import '../../addonglobal/topbar.dart';
 import '../../police/acteurs/userinfo.dart';
@@ -17,10 +18,10 @@ class HomeScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Mon Récap", // Pass the page name here
+        PageName: "Missions Effectuées", // Pass the page name here
       ),
       backgroundColor: Colors.grey,
-      body: HomeChild(),
+      body: MissionScreen(),
       //bottomNavigationBar: MyBottomBar(),
     );
   }

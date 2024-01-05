@@ -26,21 +26,11 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TopBarS(
-        onNotificationPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => NotifScreen()));
-        },
-        PageName: "Mes Missions", // Pass the page name here
-        tabController: _tabController,
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          BodyM(),
 
-          Container(),
-        ],
+      body: Scaffold(
+
+      body:Center(
+        child: BodyM(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -51,7 +41,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         },
         child: const Icon(Icons.add),
       ),
-    );
+    ));
   }
 }
 

@@ -19,7 +19,7 @@ class PlanningScreen extends StatelessWidget {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => NotifScreen()));
         },
-        PageName: "Mon Planning", // Pass the page name here
+        PageName: "Accueil", // Pass the page name here
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -29,7 +29,7 @@ class PlanningScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add),
       ),
-      body:  CustomTableCalendar (),
+      body:  CalendarPage (),
     );
   }
 }

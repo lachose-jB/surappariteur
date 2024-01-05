@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import '../../acteurs/fichepaie.dart';
 import '../../helper/serveur/authentificateur.dart';
@@ -20,10 +20,7 @@ class _FichesPaieChildState extends State<FichesPaieChild> {
   }
 
   Future<void> loadFichesPaie() async {
-    print('Chargement des fiches paie...');
     final loadedFichesPaie = await AuthApi.getFichesPaie();
-    print('Fiches de paies chargées:');
-    print(loadedFichesPaie);
     setState(() {
       fichesPaie = loadedFichesPaie;
     });
@@ -48,9 +45,7 @@ class _FichesPaieChildState extends State<FichesPaieChild> {
               child: ListView.builder(
                 itemCount: snapshot.data!.length,
                 padding: EdgeInsets.all(_w / 30),
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
+                physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext c, int i) {
                   final fiche = snapshot.data![i];
                   return AnimationConfiguration.staggeredList(
@@ -80,51 +75,71 @@ class ListItem extends StatelessWidget {
 
   ListItem({required this.width, required this.fiche});
 
-  Future<void> downloadFiche(String fileName) async {
-    final downloadUrl = 'https://appariteur.com/admins/documents/$fileName';
-
-    // Ajoutez le schéma du lien (http:// ou https://) pour garantir que canLaunch fonctionne correctement
-    if (await canLaunch('http://$downloadUrl') || await canLaunch('https://$downloadUrl')) {
-      await launch(downloadUrl);
-    } else {
-      print('Could not launch $downloadUrl');
-    }
-  }
-
-
   @override
   Widget build(BuildContext context) {
     return FlipAnimation(
       duration: const Duration(milliseconds: 3000),
       curve: Curves.fastLinearToSlowEaseIn,
       flipAxis: FlipAxis.y,
-      child: Container(
+      child: Card(
+        surfaceTintColor: Colors.white,
         margin: EdgeInsets.only(bottom: width / 20),
-        height: width / 4,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 40,
-              spreadRadius: 10,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 10,
+        child: InkWell(
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PDFScreen(url: 'https://appariteur.com/admins/documents/${fiche.fichier}'),
             ),
-          ],
-        ),
-        child: ListTile(
-          title: Text('${fiche.mois} ${fiche.annee}'),
-          subtitle: Text('Date de création: ${fiche.dateCreate}'),
-          trailing: ElevatedButton(
-            onPressed: () {
-              downloadFiche(fiche.fichier);
-            },
-            child: Text('Télécharger'),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.picture_as_pdf, color: Colors.redAccent),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text('${fiche.mois} ${fiche.annee}', style: Theme.of(context).textTheme.headline6),
+                    ),
+                    Icon(Icons.check_circle, color: Colors.green) // Status icon example
+                  ],
+                ),
+                SizedBox(height: 10),
+                Text('Créée le: ${fiche.dateCreate}', style: Theme.of(context).textTheme.subtitle2),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Voir ', style: Theme.of(context).textTheme.bodyText1),
+                    Icon(Icons.remove_red_eye, color: Theme.of(context).primaryColor),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class PDFScreen extends StatelessWidget {
+  final String url;
+
+  const PDFScreen({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Fiche de Paie'),
+      ),
+      body: SfPdfViewer.network(url),
     );
   }
 }

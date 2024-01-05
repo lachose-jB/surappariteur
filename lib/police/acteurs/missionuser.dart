@@ -1,39 +1,33 @@
-  class MissionEffUser {
-    final List<Mission> missionList;
-    final String month;
-    final String monthyear;
-    final String? sum_heure; // Modifier String en String?
-    final int lastyear;
-    final List<Year> years;
+class MissionEffUser {
+  List<Mission> missions;
+  String totalHeure;
 
-    MissionEffUser({
-      required this.missionList,
-      required this.month,
-      required this.monthyear,
-      this.sum_heure, // Modifier String en String?
-      required this.lastyear,
-      required this.years,
-    });
+  MissionEffUser({required this.missions, required this.totalHeure});
+
+  factory MissionEffUser.fromJson(Map<String, dynamic> json) {
+    var list = json['data'] as List;
+    List<Mission> missionList = list.map((i) => Mission.fromJson(i)).toList();
+    return MissionEffUser(
+      missions: missionList,
+      totalHeure: json['total_heure'],
+    );
   }
+}
 
-  class Mission {
-    final String date;
-    final String reference;
-    final String etabli;
-    final String duree;
+class Mission {
+  String date;
+  String reference;
+  String etabli;
+  String duree;
 
-    Mission({
-      required this.date,
-      required this.reference,
-      required this.etabli,
-      required this.duree,
-    });
+  Mission({required this.date, required this.reference, required this.etabli, required this.duree});
+
+  factory Mission.fromJson(Map<String, dynamic> json) {
+    return Mission(
+      date: json['date'],
+      reference: json['reference'],
+      etabli: json['etabli'],
+      duree: json['duree'],
+    );
   }
-
-  class Year {
-    final String year;
-
-    Year({
-      required this.year,
-    });
-  }
+}

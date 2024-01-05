@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../acteurs/contrat.dart';
 import '../../helper/serveur/authentificateur.dart';
 
@@ -19,15 +20,11 @@ class _ContratChildState extends State<ContratChild> {
   }
 
   Future<void> loadData() async {
-    print('Chargement des contrats...');
     setState(() {
       isLoading = true;
     });
 
     final loadedContrats = await AuthApi.getContrats();
-
-    print('Contrats chargés:');
-    print('Contrats : $loadedContrats');
 
     setState(() {
       contrats = loadedContrats;
@@ -42,7 +39,7 @@ class _ContratChildState extends State<ContratChild> {
     return Scaffold(
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : contrats == null
+          : contrats == null || contrats!.isEmpty
           ? Center(child: Text("Pas de contrats"))
           : AnimationLimiter(
         child: ListView.builder(
@@ -83,34 +80,73 @@ class ContratItem extends StatelessWidget {
       duration: const Duration(milliseconds: 3000),
       curve: Curves.fastLinearToSlowEaseIn,
       flipAxis: FlipAxis.y,
-      child: Container(
+      child: Card(
+        surfaceTintColor: Colors.white,
         margin: EdgeInsets.only(bottom: width / 20),
-        height: width / 4,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(20),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 40,
-              spreadRadius: 10,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 10,
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PDFScreen(url: 'https://appariteur.com/admins/documents/${contrat.nameFichier}'),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.picture_as_pdf, color: Colors.redAccent),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(contrat.typeContrat, style: Theme.of(context).textTheme.headline6),
+                    ),
+                    Icon(Icons.check_circle, color: Colors.green)
+                  ],
+                ),
+                SizedBox(height: 10),
+                Text('Date de début: ${contrat.dateEmbauche}', style: Theme.of(context).textTheme.subtitle2),
+                SizedBox(height: 5),
+                Text('Date de fin: ${contrat.dateFinContrat}', style: Theme.of(context).textTheme.subtitle2),
+                SizedBox(height: 5),
+                Text('Montant par heure: ${contrat.montantHeure}', style: Theme.of(context).textTheme.subtitle2),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('Voir ', style: Theme.of(context).textTheme.bodyText1),
+                      Icon(Icons.remove_red_eye, color: Theme.of(context).primaryColor),
+                    ],
+                  ),
+                )
+              ],
             ),
-          ],
-        ),
-        child: ListTile(
-          title: Text('Type de contrat: ${contrat.typeContrat}'),
-          subtitle: Text('Date de début: ${contrat.dateEmbauche}'),
-          trailing: ElevatedButton(
-            onPressed: () {
-              // Ajoutez ici la logique pour télécharger le contrat
-              // Vous pouvez utiliser le package 'url_launcher' pour ouvrir le lien dans le navigateur ou 'http' pour télécharger le fichier
-            },
-            child: Text('Télécharger Contrat'),
           ),
         ),
       ),
+    );
+  }
+}
+
+class PDFScreen extends StatelessWidget {
+  final String url;
+
+  const PDFScreen({Key? key, required this.url}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Document'),
+      ),
+      body: SfPdfViewer.network(url),
     );
   }
 }
